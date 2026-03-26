@@ -1,1743 +1,2042 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AL-FATIHA · 智能蓝牙 Tasbih 计数器</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Serif+SC:wght@300;400;600;700&family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-<script>
-  tailwind.config = {
-    darkMode: 'class',
-    theme: {
-      extend: {
-        colors: {
-          emerald: { 950: '#022c22' },
-          gold: {
-            400: '#e8a030',
-            500: '#d4882a',
-            600: '#b87020',
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AL-FATIHA · 智能蓝牙 Tasbih 计数器</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Serif+SC:wght@300;400;600;700&family=Josefin+Sans:wght@300;400;600;700&display=swap"
+    rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            emerald: { 950: '#022c22' },
+            gold: {
+              400: '#e8a030',
+              500: '#d4882a',
+              600: '#b87020',
+            }
+          },
+          fontFamily: {
+            arabic: ['Amiri', 'serif'],
+            serif: ['Noto Serif SC', 'serif'],
+            display: ['Josefin Sans', 'sans-serif'],
           }
-        },
-        fontFamily: {
-          arabic: ['Amiri', 'serif'],
-          serif: ['Noto Serif SC', 'serif'],
-          display: ['Josefin Sans', 'sans-serif'],
         }
       }
     }
-  }
-</script>
+  </script>
 
-<style>
-  /* ─── CSS Variables ─────────────────────────────────── */
-  :root {
-    --clr-bg:       #f7f5f0;
-    --clr-surface:  #ffffff;
-    --clr-green:    #1a4d2e;
-    --clr-green2:   #2e7d52;
-    --clr-gold:     #d4882a;
-    --clr-text:     #1a1a1a;
-    --clr-muted:    #5a5a5a;
-    --pat-opacity:  0.06;
-  }
-  .dark {
-    --clr-bg:       #0d1f14;
-    --clr-surface:  #112318;
-    --clr-green:    #2e7d52;
-    --clr-green2:   #3fa06a;
-    --clr-gold:     #e8a030;
-    --clr-text:     #f0ebe0;
-    --clr-muted:    #a0a090;
-    --pat-opacity:  0.10;
-  }
+  <style>
+    /* ─── CSS Variables ─────────────────────────────────── */
+    :root {
+      --clr-bg: #f7f5f0;
+      --clr-surface: #ffffff;
+      --clr-green: #1a4d2e;
+      --clr-green2: #2e7d52;
+      --clr-gold: #d4882a;
+      --clr-text: #1a1a1a;
+      --clr-muted: #5a5a5a;
+      --pat-opacity: 0.06;
+    }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+    .dark {
+      --clr-bg: #0d1f14;
+      --clr-surface: #112318;
+      --clr-green: #2e7d52;
+      --clr-green2: #3fa06a;
+      --clr-gold: #e8a030;
+      --clr-text: #f0ebe0;
+      --clr-muted: #a0a090;
+      --pat-opacity: 0.10;
+    }
 
-  html { scroll-behavior: smooth; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  body {
-    background: var(--clr-bg);
-    color: var(--clr-text);
-    font-family: 'Noto Serif SC', serif;
-    transition: background 0.4s, color 0.4s;
-  }
+    html {
+      scroll-behavior: smooth;
+    }
 
-  /* ─── Islamic Geometric Pattern ────────────────────── */
-  .islamic-bg {
-    position: relative;
-    overflow: hidden;
-  }
-  .islamic-bg::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-      url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='0.6'%3E%3Cpolygon points='40,5 55,14 55,32 40,41 25,32 25,14'/%3E%3Cpolygon points='40,39 55,48 55,66 40,75 25,66 25,48'/%3E%3Cpolygon points='5,22 20,13 20,31 5,40 -10,31 -10,13'/%3E%3Cpolygon points='75,22 90,13 90,31 75,40 60,31 60,13'/%3E%3Cpolygon points='5,58 20,49 20,67 5,76 -10,67 -10,49'/%3E%3Cpolygon points='75,58 90,49 90,67 75,76 60,67 60,49'/%3E%3C/g%3E%3C/svg%3E");
-    opacity: var(--pat-opacity);
-    pointer-events: none;
-  }
+    body {
+      background: var(--clr-bg);
+      color: var(--clr-text);
+      font-family: 'Noto Serif SC', serif;
+      transition: background 0.4s, color 0.4s;
+    }
 
-  /* ─── Navigation ────────────────────────────────────── */
-  #navbar {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    background: transparent;
-    transition: background 0.35s, backdrop-filter 0.35s, box-shadow 0.35s;
-  }
-  #navbar.scrolled {
-    background: var(--clr-surface);
-    backdrop-filter: blur(12px);
-    box-shadow: 0 2px 24px rgba(0,0,0,0.12);
-  }
+    /* ─── Islamic Geometric Pattern ────────────────────── */
+    .islamic-bg {
+      position: relative;
+      overflow: hidden;
+    }
 
-  /* ─── Hero ──────────────────────────────────────────── */
-  .hero-bg {
-    background: linear-gradient(160deg, #0d2e1a 0%, #1a4d2e 45%, #0f3d26 100%);
-  }
+    .islamic-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='0.6'%3E%3Cpolygon points='40,5 55,14 55,32 40,41 25,32 25,14'/%3E%3Cpolygon points='40,39 55,48 55,66 40,75 25,66 25,48'/%3E%3Cpolygon points='5,22 20,13 20,31 5,40 -10,31 -10,13'/%3E%3Cpolygon points='75,22 90,13 90,31 75,40 60,31 60,13'/%3E%3Cpolygon points='5,58 20,49 20,67 5,76 -10,67 -10,49'/%3E%3Cpolygon points='75,58 90,49 90,67 75,76 60,67 60,49'/%3E%3C/g%3E%3C/svg%3E");
+      opacity: var(--pat-opacity);
+      pointer-events: none;
+    }
 
-  .hero-orb {
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(212,136,42,0.18) 0%, transparent 70%);
-    animation: pulse-orb 4s ease-in-out infinite;
-  }
-  @keyframes pulse-orb {
-    0%, 100% { transform: scale(1); opacity: 0.7; }
-    50%       { transform: scale(1.12); opacity: 1; }
-  }
+    /* ─── Navigation ────────────────────────────────────── */
+    #navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: transparent;
+      transition: background 0.35s, backdrop-filter 0.35s, box-shadow 0.35s;
+    }
 
-  /* ─── Logo ──────────────────────────────────────────── */
-  .logo-ring {
-    width: 72px; height: 72px;
-    border-radius: 50%;
-    border: 2px solid var(--clr-gold);
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(255,255,255,0.06);
-    flex-shrink: 0;
-  }
+    #navbar.scrolled {
+      background: var(--clr-surface);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 2px 24px rgba(0, 0, 0, 0.12);
+    }
 
-  /* ─── Phone Mockup ──────────────────────────────────── */
-  .phone-frame {
-    width: 220px;
-    border-radius: 32px;
-    border: 3px solid rgba(255,255,255,0.2);
-    box-shadow: 0 32px 64px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.05);
-    overflow: hidden;
-    background: #0f2e1a;
-    position: relative;
-  }
-  .phone-frame::before {
-    content: '';
-    position: absolute;
-    top: 12px; left: 50%; transform: translateX(-50%);
-    width: 60px; height: 8px;
-    border-radius: 4px;
-    background: rgba(0,0,0,0.5);
-    z-index: 2;
-  }
+    /* ─── Hero ──────────────────────────────────────────── */
+    .hero-bg {
+      background: linear-gradient(160deg, #0d2e1a 0%, #1a4d2e 45%, #0f3d26 100%);
+    }
 
-  /* ─── Feature Cards ─────────────────────────────────── */
-  .feat-card {
-    background: var(--clr-surface);
-    border: 1px solid rgba(46,125,82,0.2);
-    border-radius: 16px;
-    padding: 28px 24px;
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s;
-    position: relative;
-    overflow: hidden;
-  }
-  .feat-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 16px;
-    border: 1px solid transparent;
-    transition: border-color 0.25s;
-    pointer-events: none;
-  }
-  .feat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 40px rgba(26,77,46,0.15);
-  }
-  .feat-card:hover::after {
-    border-color: var(--clr-gold);
-  }
+    .hero-orb {
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212, 136, 42, 0.18) 0%, transparent 70%);
+      animation: pulse-orb 4s ease-in-out infinite;
+    }
 
-  .feat-icon {
-    width: 52px; height: 52px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #1a4d2e, #2e7d52);
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 16px;
-    color: #e8a030;
-    font-size: 22px;
-  }
+    @keyframes pulse-orb {
 
-  /* ─── Section Divider ───────────────────────────────── */
-  .divider-gem {
-    display: flex; align-items: center; gap: 12px;
-    margin: 0 auto 16px;
-    width: fit-content;
-  }
-  .divider-gem::before, .divider-gem::after {
-    content: '';
-    display: block;
-    width: 48px; height: 1px;
-    background: var(--clr-gold);
-    opacity: 0.6;
-  }
-  .divider-gem span {
-    color: var(--clr-gold);
-    font-size: 18px;
-  }
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 0.7;
+      }
 
-  /* ─── Steps ─────────────────────────────────────────── */
-  .step-num {
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    background: var(--clr-green);
-    color: var(--clr-gold);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Josefin Sans', sans-serif;
-    font-size: 18px; font-weight: 700;
-    flex-shrink: 0;
-    border: 2px solid var(--clr-gold);
-  }
-  .step-line {
-    flex: 1; height: 2px;
-    background: linear-gradient(to right, var(--clr-gold), transparent);
-    opacity: 0.4;
-  }
+      50% {
+        transform: scale(1.12);
+        opacity: 1;
+      }
+    }
 
-  /* ─── App Screenshot Cards ──────────────────────────── */
-  .ss-card {
-    border-radius: 20px;
-    overflow: hidden;
-    border: 2px solid rgba(46,125,82,0.25);
-    transition: transform 0.3s, box-shadow 0.3s;
-    background: #0f2e1a;
-  }
-  .ss-card:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 24px 56px rgba(0,0,0,0.35);
-  }
+    /* ─── Logo ──────────────────────────────────────────── */
+    .logo-ring {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 2px solid var(--clr-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.06);
+      flex-shrink: 0;
+    }
 
-  /* ─── Spec Table ────────────────────────────────────── */
-  .spec-row {
-    display: flex;
-    border-bottom: 1px solid rgba(46,125,82,0.15);
-    padding: 12px 0;
-    gap: 16px;
-    align-items: flex-start;
-  }
-  .spec-label {
-    font-family: 'Josefin Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    color: var(--clr-muted);
-    text-transform: uppercase;
-    min-width: 140px;
-    flex-shrink: 0;
-  }
-  .spec-val {
-    color: var(--clr-text);
-    font-size: 15px;
-    line-height: 1.6;
-  }
+    /* ─── Phone Mockup ──────────────────────────────────── */
+    .phone-frame {
+      width: 220px;
+      border-radius: 32px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 32px 64px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+      background: #0f2e1a;
+      position: relative;
+    }
 
-  /* ─── Download Buttons ──────────────────────────────── */
-  .dl-btn {
-    display: inline-flex; align-items: center; gap: 10px;
-    padding: 14px 28px;
-    border-radius: 12px;
-    font-family: 'Josefin Sans', sans-serif;
-    font-size: 15px; font-weight: 600;
-    letter-spacing: 0.04em;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    text-decoration: none;
-    cursor: pointer;
-  }
-  .dl-btn:hover {
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
-  }
-  .dl-btn:active { transform: scale(0.98); }
+    .phone-frame::before {
+      content: '';
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2;
+    }
 
-  .dl-ios {
-    background: var(--clr-text);
-    color: var(--clr-bg);
-  }
-  .dl-android {
-    background: var(--clr-gold);
-    color: #0d2e1a;
-  }
+    /* ─── Feature Cards ─────────────────────────────────── */
+    .feat-card {
+      background: var(--clr-surface);
+      border: 1px solid rgba(46, 125, 82, 0.2);
+      border-radius: 16px;
+      padding: 28px 24px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
 
-  /* ─── Gold Text ─────────────────────────────────────── */
-  .gold { color: var(--clr-gold); }
+    .feat-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      border: 1px solid transparent;
+      transition: border-color 0.25s;
+      pointer-events: none;
+    }
 
-  /* ─── Fade-in animations ────────────────────────────── */
-  .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
-  .fade-in.visible { opacity: 1; transform: none; }
-  .fade-in-delay-1 { transition-delay: 0.1s; }
-  .fade-in-delay-2 { transition-delay: 0.2s; }
-  .fade-in-delay-3 { transition-delay: 0.3s; }
-  .fade-in-delay-4 { transition-delay: 0.4s; }
-  .fade-in-delay-5 { transition-delay: 0.5s; }
+    .feat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(26, 77, 46, 0.15);
+    }
 
-  /* ─── Language Dropdown ──────────────────────────────── */
-  .lang-dropdown { position: relative; }
-  .lang-dropdown-btn {
-    display: flex; align-items: center; gap: 4px;
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-family: 'Josefin Sans', sans-serif;
-    font-size: 13px; font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s, border-color 0.2s;
-    border: 1px solid rgba(255,255,255,0.25);
-    color: #fff;
-    background: transparent;
-  }
-  .lang-dropdown-btn i { font-size: 10px; transition: transform 0.2s; }
-  .lang-dropdown.open .lang-dropdown-btn i { transform: rotate(180deg); }
-  #navbar.scrolled .lang-dropdown-btn { border-color: rgba(26,77,46,0.3); color: var(--clr-text); }
-  .lang-dropdown-menu {
-    position: absolute; top: 100%; right: 0;
-    margin-top: 6px;
-    background: var(--clr-surface);
-    border: 1px solid rgba(46,125,82,0.2);
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    overflow: hidden;
-    opacity: 0; visibility: hidden;
-    transform: translateY(-8px);
-    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
-    z-index: 200;
-    min-width: 100px;
-  }
-  .lang-dropdown.open .lang-dropdown-menu {
-    opacity: 1; visibility: visible;
-    transform: translateY(0);
-  }
-  .lang-dropdown-menu a {
-    display: block; padding: 8px 16px;
-    font-family: 'Josefin Sans', sans-serif;
-    font-size: 13px; font-weight: 500;
-    color: var(--clr-text);
-    transition: background 0.15s;
-    cursor: pointer; text-decoration: none;
-  }
-  .lang-dropdown-menu a:hover { background: rgba(46,125,82,0.08); }
-  .lang-dropdown-menu a.active { color: var(--clr-gold); font-weight: 700; }
+    .feat-card:hover::after {
+      border-color: var(--clr-gold);
+    }
 
-  /* ─── Nav Link Scrolled State ────────────────────────── */
-  .nav-link { transition: color 0.2s, opacity 0.2s; }
-  #navbar.scrolled .nav-link { color: var(--clr-muted); }
-  #navbar.scrolled .nav-link:hover { color: var(--clr-text); }
-  #navbar.scrolled #menu-btn { color: var(--clr-text); }
+    .feat-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1a4d2e, #2e7d52);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      color: #e8a030;
+      font-size: 22px;
+    }
 
-  /* ─── Counter Animation ─────────────────────────────── */
-  .counter-display {
-    font-family: 'Josefin Sans', sans-serif;
-    font-size: 64px; font-weight: 700;
-    color: var(--clr-gold);
-    line-height: 1;
-    letter-spacing: -2px;
-  }
+    /* ─── Section Divider ───────────────────────────────── */
+    .divider-gem {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 auto 16px;
+      width: fit-content;
+    }
 
-  /* ─── Prayer Time Band ──────────────────────────────── */
-  .prayer-band {
-    background: linear-gradient(135deg, #1a4d2e 0%, #0d2e1a 100%);
-    color: #fff;
-  }
-  .prayer-item {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 16px;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.06);
-    margin-bottom: 8px;
-    transition: background 0.2s;
-  }
-  .prayer-item:hover { background: rgba(255,255,255,0.1); }
-  .prayer-item.active {
-    background: rgba(212,136,42,0.2);
-    border: 1px solid rgba(212,136,42,0.5);
-  }
+    .divider-gem::before,
+    .divider-gem::after {
+      content: '';
+      display: block;
+      width: 48px;
+      height: 1px;
+      background: var(--clr-gold);
+      opacity: 0.6;
+    }
 
-  /* ─── Theme Icon Button ──────────────────────────────── */
-  .theme-icon-btn {
-    width: 34px; height: 34px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.25);
-    background: transparent;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-    transition: background 0.2s, border-color 0.2s, transform 0.2s;
-    flex-shrink: 0;
-  }
-  .theme-icon-btn:hover { transform: scale(1.1); }
-  #navbar.scrolled .theme-icon-btn { border-color: rgba(26,77,46,0.3); }
-  .theme-icon-btn .fa-sun { color: #f59e0b; }
-  .theme-icon-btn .fa-moon { color: #818cf8; }
+    .divider-gem span {
+      color: var(--clr-gold);
+      font-size: 18px;
+    }
 
-  /* ─── Nav Buy Button ─────────────────────────────────── */
-  .nav-buy-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 7px 16px;
-    border-radius: 8px;
-    font-family: 'Josefin Sans', sans-serif;
-    font-size: 13px; font-weight: 600;
-    background: var(--clr-gold);
-    color: #0d2e1a;
-    border: none; cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    text-decoration: none; white-space: nowrap;
-  }
-  .nav-buy-btn:hover {
-    transform: translateY(-1px) scale(1.03);
-    box-shadow: 0 4px 16px rgba(212,136,42,0.35);
-  }
+    /* ─── Steps ─────────────────────────────────────────── */
+    .step-num {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--clr-green);
+      color: var(--clr-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      flex-shrink: 0;
+      border: 2px solid var(--clr-gold);
+    }
 
-  /* ─── Tasbih Count Display ──────────────────────────── */
-  .tasbih-bead {
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    background: var(--clr-gold);
-    display: inline-block;
-    margin: 2px;
-    opacity: 0.25;
-    transition: opacity 0.2s;
-  }
-  .tasbih-bead.lit { opacity: 1; }
+    .step-line {
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(to right, var(--clr-gold), transparent);
+      opacity: 0.4;
+    }
 
-  /* ─── Scrollbar ─────────────────────────────────────── */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--clr-bg); }
-  ::-webkit-scrollbar-thumb { background: var(--clr-green2); border-radius: 3px; }
-</style>
+    /* ─── App Screenshot Cards ──────────────────────────── */
+    .ss-card {
+      border-radius: 20px;
+      overflow: hidden;
+      border: 2px solid rgba(46, 125, 82, 0.25);
+      transition: transform 0.3s, box-shadow 0.3s;
+      background: #0f2e1a;
+    }
+
+    .ss-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 24px 56px rgba(0, 0, 0, 0.35);
+    }
+
+    /* ─── Spec Table ────────────────────────────────────── */
+    .spec-row {
+      display: flex;
+      border-bottom: 1px solid rgba(46, 125, 82, 0.15);
+      padding: 12px 0;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .spec-label {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--clr-muted);
+      text-transform: uppercase;
+      min-width: 140px;
+      flex-shrink: 0;
+    }
+
+    .spec-val {
+      color: var(--clr-text);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ─── Download Buttons ──────────────────────────────── */
+    .dl-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .dl-btn:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+    }
+
+    .dl-btn:active {
+      transform: scale(0.98);
+    }
+
+    .dl-ios {
+      background: var(--clr-text);
+      color: var(--clr-bg);
+    }
+
+    .dl-android {
+      background: var(--clr-gold);
+      color: #0d2e1a;
+    }
+
+    /* ─── Gold Text ─────────────────────────────────────── */
+    .gold {
+      color: var(--clr-gold);
+    }
+
+    /* ─── Fade-in animations ────────────────────────────── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    .fade-in-delay-1 {
+      transition-delay: 0.1s;
+    }
+
+    .fade-in-delay-2 {
+      transition-delay: 0.2s;
+    }
+
+    .fade-in-delay-3 {
+      transition-delay: 0.3s;
+    }
+
+    .fade-in-delay-4 {
+      transition-delay: 0.4s;
+    }
+
+    .fade-in-delay-5 {
+      transition-delay: 0.5s;
+    }
+
+    /* ─── Language Dropdown ──────────────────────────────── */
+    .lang-dropdown {
+      position: relative;
+    }
+
+    .lang-dropdown-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+      background: transparent;
+    }
+
+    .lang-dropdown-btn i {
+      font-size: 10px;
+      transition: transform 0.2s;
+    }
+
+    .lang-dropdown.open .lang-dropdown-btn i {
+      transform: rotate(180deg);
+    }
+
+    #navbar.scrolled .lang-dropdown-btn {
+      border-color: rgba(26, 77, 46, 0.3);
+      color: var(--clr-text);
+    }
+
+    .lang-dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 6px;
+      background: var(--clr-surface);
+      border: 1px solid rgba(46, 125, 82, 0.2);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+      z-index: 200;
+      min-width: 100px;
+    }
+
+    .lang-dropdown.open .lang-dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .lang-dropdown-menu a {
+      display: block;
+      padding: 8px 16px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--clr-text);
+      transition: background 0.15s;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .lang-dropdown-menu a:hover {
+      background: rgba(46, 125, 82, 0.08);
+    }
+
+    .lang-dropdown-menu a.active {
+      color: var(--clr-gold);
+      font-weight: 700;
+    }
+
+    /* ─── Nav Link Scrolled State ────────────────────────── */
+    .nav-link {
+      transition: color 0.2s, opacity 0.2s;
+    }
+
+    #navbar.scrolled .nav-link {
+      color: var(--clr-muted);
+    }
+
+    #navbar.scrolled .nav-link:hover {
+      color: var(--clr-text);
+    }
+
+    #navbar.scrolled #menu-btn {
+      color: var(--clr-text);
+    }
+
+    /* ─── Counter Animation ─────────────────────────────── */
+    .counter-display {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 64px;
+      font-weight: 700;
+      color: var(--clr-gold);
+      line-height: 1;
+      letter-spacing: -2px;
+    }
+
+    /* ─── Prayer Time Band ──────────────────────────────── */
+    .prayer-band {
+      background: linear-gradient(135deg, #1a4d2e 0%, #0d2e1a 100%);
+      color: #fff;
+    }
+
+    .prayer-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      margin-bottom: 8px;
+      transition: background 0.2s;
+    }
+
+    .prayer-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .prayer-item.active {
+      background: rgba(212, 136, 42, 0.2);
+      border: 1px solid rgba(212, 136, 42, 0.5);
+    }
+
+    /* ─── Theme Icon Button ──────────────────────────────── */
+    .theme-icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .theme-icon-btn:hover {
+      transform: scale(1.1);
+    }
+
+    #navbar.scrolled .theme-icon-btn {
+      border-color: rgba(26, 77, 46, 0.3);
+    }
+
+    .theme-icon-btn .fa-sun {
+      color: #f59e0b;
+    }
+
+    .theme-icon-btn .fa-moon {
+      color: #818cf8;
+    }
+
+    /* ─── Nav Buy Button ─────────────────────────────────── */
+    .nav-buy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 8px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--clr-gold);
+      color: #0d2e1a;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-buy-btn:hover {
+      transform: translateY(-1px) scale(1.03);
+      box-shadow: 0 4px 16px rgba(212, 136, 42, 0.35);
+    }
+
+    /* ─── Tasbih Count Display ──────────────────────────── */
+    .tasbih-bead {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--clr-gold);
+      display: inline-block;
+      margin: 2px;
+      opacity: 0.25;
+      transition: opacity 0.2s;
+    }
+
+    .tasbih-bead.lit {
+      opacity: 1;
+    }
+
+    /* ─── Scrollbar ─────────────────────────────────────── */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--clr-bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--clr-green2);
+      border-radius: 3px;
+    }
+  </style>
 </head>
 
 <body id="body">
 
-<!-- ╔════════════════════════════════════╗ -->
-<!-- ║  NAVBAR                            ║ -->
-<!-- ╚════════════════════════════════════╝ -->
-<nav id="navbar" class="px-4 md:px-8">
-  <div class="max-w-6xl mx-auto flex items-center justify-between h-16">
+  <!-- ╔════════════════════════════════════╗ -->
+  <!-- ║  NAVBAR                            ║ -->
+  <!-- ╚════════════════════════════════════╝ -->
+  <nav id="navbar" class="px-4 md:px-8">
+    <div class="max-w-6xl mx-auto flex items-center justify-between h-16">
 
-    <!-- Logo -->
-    <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-full border border-gold-400 flex items-center justify-center bg-white/10 overflow-hidden">
-        <img src="/mnt/user-data/uploads/logo.png" alt="AL-FATIHA" class="w-8 h-8 object-contain rounded-full">
+      <!-- Logo -->
+      <div class="flex items-center gap-3">
+        <div
+          class="w-9 h-9 rounded-full border border-gold-400 flex items-center justify-center bg-white/10 overflow-hidden">
+          <img src="./img/logo.png" alt="AL-FATIHA" class="w-8 h-8 object-contain rounded-full">
+        </div>
+        <span
+          class="font-display text-white font-semibold text-sm tracking-widest uppercase hidden sm:block">AL-FATIHA</span>
       </div>
-      <span class="font-display text-white font-semibold text-sm tracking-widest uppercase hidden sm:block">AL-FATIHA</span>
-    </div>
 
-    <!-- Nav Links (desktop) -->
-    <div class="hidden lg:flex items-center gap-4 text-white/80 text-[13px] font-display tracking-wide">
-      <a href="#body" class="nav-link hover:text-white transition cn" data-en="Home" data-zh="首页">首页</a>
-      <a href="#features" class="nav-link hover:text-white transition cn" data-en="Features" data-zh="核心功能">核心功能</a>
-      <a href="#tasbih-demo" class="nav-link hover:text-white transition cn" data-en="Try It" data-zh="在线体验">在线体验</a>
-      <a href="#screenshots" class="nav-link hover:text-white transition cn" data-en="App" data-zh="应用展示">应用展示</a>
-      <a href="#howto" class="nav-link hover:text-white transition cn" data-en="Guide" data-zh="操作指南">操作指南</a>
-      <a href="#specs" class="nav-link hover:text-white transition cn" data-en="Specs" data-zh="产品规格">产品规格</a>
-      <a href="#faq" class="nav-link hover:text-white transition cn" data-en="FAQ" data-zh="常见问题">常见问题</a>
-      <a href="#contact" class="nav-link hover:text-white transition cn" data-en="Contact" data-zh="联系我们">联系我们</a>
-    </div>
+      <!-- Nav Links (desktop) -->
+      <div class="hidden lg:flex items-center gap-4 text-white/80 text-[13px] font-display tracking-wide">
+        <a href="#body" class="nav-link hover:text-white transition cn" data-en="Home" data-zh="首页">首页</a>
+        <a href="#features" class="nav-link hover:text-white transition cn" data-en="Features" data-zh="核心功能">核心功能</a>
+        <a href="#tasbih-demo" class="nav-link hover:text-white transition cn" data-en="Try It" data-zh="在线体验">在线体验</a>
+        <a href="#screenshots" class="nav-link hover:text-white transition cn" data-en="App" data-zh="应用展示">应用展示</a>
+        <a href="#howto" class="nav-link hover:text-white transition cn" data-en="Guide" data-zh="操作指南">操作指南</a>
+        <a href="#specs" class="nav-link hover:text-white transition cn" data-en="Specs" data-zh="产品规格">产品规格</a>
+        <a href="#faq" class="nav-link hover:text-white transition cn" data-en="FAQ" data-zh="常见问题">常见问题</a>
+        <a href="#contact" class="nav-link hover:text-white transition cn" data-en="Contact" data-zh="联系我们">联系我们</a>
+      </div>
 
-    <!-- Right Controls -->
-    <div class="flex items-center gap-3">
-      <!-- Language Dropdown -->
-      <div class="lang-dropdown" id="lang-dropdown">
-        <button class="lang-dropdown-btn" onclick="toggleLangDropdown()">
-          <span id="lang-label">中</span>
-          <i class="fa fa-chevron-down"></i>
+      <!-- Right Controls -->
+      <div class="flex items-center gap-3">
+        <!-- Language Dropdown -->
+        <div class="lang-dropdown" id="lang-dropdown">
+          <button class="lang-dropdown-btn" onclick="toggleLangDropdown()">
+            <span id="lang-label">中</span>
+            <i class="fa fa-chevron-down"></i>
+          </button>
+          <div class="lang-dropdown-menu">
+            <a onclick="setLang('zh')" id="btn-zh" class="active">中文</a>
+            <a onclick="setLang('en')" id="btn-en">English</a>
+          </div>
+        </div>
+        <!-- Theme Toggle -->
+        <button class="theme-icon-btn" onclick="toggleTheme()" aria-label="Toggle dark mode" id="theme-toggle-btn">
+          <i class="fa fa-sun"></i>
         </button>
-        <div class="lang-dropdown-menu">
-          <a onclick="setLang('zh')" id="btn-zh" class="active">中文</a>
-          <a onclick="setLang('en')" id="btn-en">English</a>
-        </div>
+        <!-- Buy Button -->
+        <a href="#purchase" class="nav-buy-btn hidden sm:inline-flex cn" data-zh="立即购买" data-en="Buy Now">立即购买</a>
+        <!-- Mobile menu -->
+        <button id="menu-btn" class="lg:hidden text-white ml-1" onclick="toggleMenu()">
+          <i class="fa fa-bars text-lg"></i>
+        </button>
       </div>
-      <!-- Theme Toggle -->
-      <button class="theme-icon-btn" onclick="toggleTheme()" aria-label="Toggle dark mode" id="theme-toggle-btn">
-        <i class="fa fa-sun"></i>
-      </button>
-      <!-- Buy Button -->
-      <a href="#purchase" class="nav-buy-btn hidden sm:inline-flex cn" data-zh="立即购买" data-en="Buy Now">立即购买</a>
-      <!-- Mobile menu -->
-      <button id="menu-btn" class="lg:hidden text-white ml-1" onclick="toggleMenu()">
-        <i class="fa fa-bars text-lg"></i>
-      </button>
     </div>
-  </div>
 
-  <!-- Mobile menu -->
-  <div id="mobile-menu" class="hidden lg:hidden bg-black/80 backdrop-blur-md pb-4 rounded-b-xl">
-    <div class="flex flex-col gap-1 px-4 pt-2 text-white/90 text-base font-display">
-      <a href="#body" onclick="closeMenu()" class="py-2 border-b border-white/10 cn" data-en="Home" data-zh="首页">首页</a>
-      <a href="#features" onclick="closeMenu()" class="py-2 border-b border-white/10 cn" data-en="Features" data-zh="核心功能">核心功能</a>
-      <a href="#tasbih-demo" onclick="closeMenu()" class="py-2 border-b border-white/10 cn" data-en="Try It" data-zh="在线体验">在线体验</a>
-      <a href="#screenshots" onclick="closeMenu()" class="py-2 border-b border-white/10 cn" data-en="App" data-zh="应用展示">应用展示</a>
-      <a href="#howto" onclick="closeMenu()" class="py-2 border-b border-white/10 cn" data-en="Guide" data-zh="操作指南">操作指南</a>
-      <a href="#specs" onclick="closeMenu()" class="py-2 border-b border-white/10 cn" data-en="Specs" data-zh="产品规格">产品规格</a>
-      <a href="#faq" onclick="closeMenu()" class="py-2 border-b border-white/10 cn" data-en="FAQ" data-zh="常见问题">常见问题</a>
-      <a href="#contact" onclick="closeMenu()" class="py-2 border-b border-white/10 cn" data-en="Contact" data-zh="联系我们">联系我们</a>
-      <a href="#purchase" onclick="closeMenu()" class="py-2 cn" data-en="Buy Now" data-zh="立即购买">立即购买</a>
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden lg:hidden bg-black/80 backdrop-blur-md pb-4 rounded-b-xl">
+      <div class="flex flex-col gap-1 px-4 pt-2 text-white/90 text-base font-display">
+        <a href="#body" onclick="closeMenu()" class="py-2 border-b border-white/10 cn" data-en="Home"
+          data-zh="首页">首页</a>
+        <a href="#features" onclick="closeMenu()" class="py-2 border-b border-white/10 cn" data-en="Features"
+          data-zh="核心功能">核心功能</a>
+        <a href="#tasbih-demo" onclick="closeMenu()" class="py-2 border-b border-white/10 cn" data-en="Try It"
+          data-zh="在线体验">在线体验</a>
+        <a href="#screenshots" onclick="closeMenu()" class="py-2 border-b border-white/10 cn" data-en="App"
+          data-zh="应用展示">应用展示</a>
+        <a href="#howto" onclick="closeMenu()" class="py-2 border-b border-white/10 cn" data-en="Guide"
+          data-zh="操作指南">操作指南</a>
+        <a href="#specs" onclick="closeMenu()" class="py-2 border-b border-white/10 cn" data-en="Specs"
+          data-zh="产品规格">产品规格</a>
+        <a href="#faq" onclick="closeMenu()" class="py-2 border-b border-white/10 cn" data-en="FAQ"
+          data-zh="常见问题">常见问题</a>
+        <a href="#contact" onclick="closeMenu()" class="py-2 border-b border-white/10 cn" data-en="Contact"
+          data-zh="联系我们">联系我们</a>
+        <a href="#purchase" onclick="closeMenu()" class="py-2 cn" data-en="Buy Now" data-zh="立即购买">立即购买</a>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
 
-<!-- ╔════════════════════════════════════╗ -->
-<!-- ║  HERO                              ║ -->
-<!-- ╚════════════════════════════════════╝ -->
-<section class="hero-bg islamic-bg min-h-screen flex flex-col justify-center pt-16 pb-12 px-4 md:px-8 relative overflow-hidden">
-  <!-- Decorative orbs -->
-  <div class="hero-orb absolute -top-32 -right-32 w-[500px] h-[500px] opacity-40"></div>
-  <div class="hero-orb absolute -bottom-24 -left-24 w-[380px] h-[380px] opacity-30" style="animation-delay:2s"></div>
+  <!-- ╔════════════════════════════════════╗ -->
+  <!-- ║  HERO                              ║ -->
+  <!-- ╚════════════════════════════════════╝ -->
+  <section
+    class="hero-bg islamic-bg min-h-screen flex flex-col justify-center pt-16 pb-12 px-4 md:px-8 relative overflow-hidden">
+    <!-- Decorative orbs -->
+    <div class="hero-orb absolute -top-32 -right-32 w-[500px] h-[500px] opacity-40"></div>
+    <div class="hero-orb absolute -bottom-24 -left-24 w-[380px] h-[380px] opacity-30" style="animation-delay:2s"></div>
 
-  <div class="max-w-6xl mx-auto w-full relative z-10">
-    <div class="grid md:grid-cols-2 gap-12 items-center">
+    <div class="max-w-6xl mx-auto w-full relative z-10">
+      <div class="grid md:grid-cols-2 gap-12 items-center">
 
-      <!-- Text -->
-      <div class="text-white">
-        <!-- Brand badge -->
-        <div class="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full border border-gold-400/40 bg-white/5">
-          <span class="w-2 h-2 rounded-full bg-gold-400 animate-pulse"></span>
-          <span class="font-display text-xs tracking-[0.2em] text-gold-400 uppercase">AL-FATIHA · الفاتحة</span>
-        </div>
+        <!-- Text -->
+        <div class="text-white">
+          <!-- Brand badge -->
+          <div
+            class="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full border border-gold-400/40 bg-white/5">
+            <span class="w-2 h-2 rounded-full bg-gold-400 animate-pulse"></span>
+            <span class="font-display text-xs tracking-[0.2em] text-gold-400 uppercase">AL-FATIHA · الفاتحة</span>
+          </div>
 
-        <h1 class="font-arabic text-5xl md:text-6xl lg:text-7xl leading-tight mb-4 cn"
-            data-zh="智能蓝牙<br>Tasbih 计数器"
+          <h1 class="font-arabic text-5xl md:text-6xl lg:text-7xl leading-tight mb-4 cn" data-zh="智能蓝牙<br>Tasbih 计数器"
             data-en="Smart Bluetooth<br>Tasbih Counter">
-          智能蓝牙<br>Tasbih 计数器
-        </h1>
-
-        <p class="text-white/70 text-lg md:text-xl leading-relaxed mb-8 max-w-lg cn"
-           data-zh="结合传统礼拜与现代科技。S01 蓝牙计数器连接手机 APP，精准记录每一次念珠，随时掌握祈祷时间与计数圈数。"
-           data-en="Bridging tradition and technology. The S01 Bluetooth Tasbih syncs with your phone app to track every bead, prayer time, and cycle count in real time.">
-          结合传统礼拜与现代科技。S01 蓝牙计数器连接手机 APP，精准记录每一次念珠，随时掌握祈祷时间与计数圈数。
-        </p>
-
-        <!-- Stats row -->
-        <div class="flex flex-wrap gap-8 mb-10">
-          <div>
-            <div class="counter-display" data-target="200">0</div>
-            <div class="text-white/50 text-sm font-display tracking-wider mt-1 cn" data-zh="个国家" data-en="Countries">个国家</div>
-          </div>
-          <div>
-            <div class="counter-display" data-target="7000">0</div>
-            <div class="text-white/50 text-sm font-display tracking-wider mt-1 cn" data-zh="个城市" data-en="Cities">个城市</div>
-          </div>
-          <div>
-            <div class="counter-display">5</div>
-            <div class="text-white/50 text-sm font-display tracking-wider mt-1 cn" data-zh="次祈祷提醒" data-en="Prayer Alerts">次祈祷提醒</div>
-          </div>
-        </div>
-
-        <!-- CTA -->
-        <div class="flex flex-wrap gap-4">
-          <a href="#download" class="dl-btn dl-android">
-            <i class="fab fa-google-play text-lg"></i>
-            <span class="cn" data-zh="Android 下载" data-en="Android Download">Android 下载</span>
-          </a>
-          <a href="#download" class="dl-btn dl-ios">
-            <i class="fab fa-apple text-lg"></i>
-            <span class="cn" data-zh="iOS 下载" data-en="iOS Download">iOS 下载</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- Phone Mockups -->
-      <div class="flex justify-center md:justify-end items-end gap-4 md:gap-6">
-        <div class="phone-frame" style="transform: rotate(-4deg) translateY(24px);">
-          <img src="/mnt/user-data/uploads/prayertime.png" alt="Prayer Time Screen" class="w-full block">
-        </div>
-        <div class="phone-frame" style="transform: rotate(3deg);">
-          <img src="/mnt/user-data/uploads/tabsih.png" alt="Tasbih Screen" class="w-full block">
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Scroll indicator -->
-  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40">
-    <span class="text-xs font-display tracking-widest uppercase cn" data-zh="向下滚动" data-en="Scroll">向下滚动</span>
-    <div class="w-px h-8 bg-gradient-to-b from-white/40 to-transparent animate-bounce"></div>
-  </div>
-</section>
-
-
-<!-- ╔════════════════════════════════════╗ -->
-<!-- ║  BRAND BAND                        ║ -->
-<!-- ╚════════════════════════════════════╝ -->
-<div class="prayer-band py-4 px-4">
-  <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-6 md:gap-12 text-white/60 font-display text-sm tracking-widest uppercase">
-    <div class="flex items-center gap-2"><i class="fa fa-bluetooth text-gold-400"></i><span class="cn" data-zh="蓝牙 5.0 连接" data-en="Bluetooth 5.0">蓝牙 5.0 连接</span></div>
-    <div class="flex items-center gap-2"><i class="fa fa-bell text-gold-400"></i><span class="cn" data-zh="振动提醒" data-en="Vibration Alert">振动提醒</span></div>
-    <div class="flex items-center gap-2"><i class="fa fa-battery-three-quarters text-gold-400"></i><span class="cn" data-zh="可充电电池" data-en="Rechargeable">可充电电池</span></div>
-    <div class="flex items-center gap-2"><i class="fa fa-mobile-alt text-gold-400"></i><span class="cn" data-zh="iOS & Android" data-en="iOS & Android">iOS & Android</span></div>
-    <div class="flex items-center gap-2"><i class="fa fa-globe text-gold-400"></i><span class="cn" data-zh="7000 城市数据" data-en="7000 Cities">7000 城市数据</span></div>
-  </div>
-</div>
-
-
-<!-- ╔════════════════════════════════════╗ -->
-<!-- ║  FEATURES                          ║ -->
-<!-- ╚════════════════════════════════════╝ -->
-<section id="features" class="py-20 px-4 md:px-8">
-  <div class="max-w-6xl mx-auto">
-
-    <div class="text-center mb-14 fade-in">
-      <div class="divider-gem"><span><i class="fa fa-star"></i></span></div>
-      <h2 class="font-arabic text-4xl md:text-5xl mb-4 cn" data-zh="核心功能" data-en="Core Features">核心功能</h2>
-      <p class="text-muted max-w-xl mx-auto text-lg cn" style="color:var(--clr-muted)"
-         data-zh="专为穆斯林信徒打造，融合智能硬件与手机应用，让每次念珠都被精准记录。"
-         data-en="Designed for Muslim practitioners — intelligent hardware meets mobile app for precise bead tracking.">
-        专为穆斯林信徒打造，融合智能硬件与手机应用，让每次念珠都被精准记录。
-      </p>
-    </div>
-
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-      <!-- Feature cards -->
-      <div class="feat-card fade-in fade-in-delay-1">
-        <div class="feat-icon"><i class="fab fa-bluetooth-b"></i></div>
-        <h3 class="font-display font-semibold text-lg mb-2 cn" data-zh="蓝牙双向通信" data-en="Bluetooth Two-Way">蓝牙双向通信</h3>
-        <p style="color:var(--clr-muted);font-size:14px;line-height:1.7" class="cn"
-           data-zh="设备名称 AL-FATIHA，与 APP 实时双向同步，计数、状态、电量全部同步显示。"
-           data-en="Device name AL-FATIHA, real-time two-way sync — count, status, and battery all synced instantly.">
-           设备名称 AL-FATIHA，与 APP 实时双向同步，计数、状态、电量全部同步显示。
-        </p>
-      </div>
-
-      <div class="feat-card fade-in fade-in-delay-2">
-        <div class="feat-icon"><i class="fa fa-kaaba"></i></div>
-        <h3 class="font-display font-semibold text-lg mb-2 cn" data-zh="完整祈祷时间" data-en="Full Prayer Times">完整祈祷时间</h3>
-        <p style="color:var(--clr-muted);font-size:14px;line-height:1.7" class="cn"
-           data-zh="覆盖 200 个国家、7000 个城市的祈祷时间数据，支持 GPS 自动定位计算。六种算法可选。"
-           data-en="Prayer time data for 200 countries and 7,000 cities, with GPS auto-location and 6 calculation methods.">
-           覆盖 200 个国家、7000 个城市的祈祷时间数据，支持 GPS 自动定位计算。六种算法可选。
-        </p>
-      </div>
-
-      <div class="feat-card fade-in fade-in-delay-3">
-        <div class="feat-icon"><i class="fa fa-hand-point-up"></i></div>
-        <h3 class="font-display font-semibold text-lg mb-2 cn" data-zh="Tasbih 智能计数" data-en="Smart Tasbih Count">Tasbih 智能计数</h3>
-        <p style="color:var(--clr-muted);font-size:14px;line-height:1.7" class="cn"
-           data-zh="支持 33 / 66 / 99 / 100 四个通道，到达倍数自动振动提醒，圈数自动累加。"
-           data-en="4 channels: 33/66/99/100. Vibrates at each cycle complete, lap count auto-increments.">
-           支持 33 / 66 / 99 / 100 四个通道，到达倍数自动振动提醒，圈数自动累加。
-        </p>
-      </div>
-
-      <div class="feat-card fade-in fade-in-delay-1">
-        <div class="feat-icon"><i class="fa fa-mobile-alt"></i></div>
-        <h3 class="font-display font-semibold text-lg mb-2 cn" data-zh="振动礼拜提醒" data-en="Prayer Vibration Alert">振动礼拜提醒</h3>
-        <p style="color:var(--clr-muted);font-size:14px;line-height:1.7" class="cn"
-           data-zh="礼拜时间到，APP 发送指令，设备振动 5 次提醒，支持开关静音模式。"
-           data-en="When prayer time arrives, the app sends a command — device vibrates 5 times. Silence mode supported.">
-           礼拜时间到，APP 发送指令，设备振动 5 次提醒，支持开关静音模式。
-        </p>
-      </div>
-
-      <div class="feat-card fade-in fade-in-delay-2">
-        <div class="feat-icon"><i class="fa fa-battery-full"></i></div>
-        <h3 class="font-display font-semibold text-lg mb-2 cn" data-zh="充电 & 低电提示" data-en="Charging & Low Battery">充电 & 低电提示</h3>
-        <p style="color:var(--clr-muted);font-size:14px;line-height:1.7" class="cn"
-           data-zh="锂电池内置充电，充电时显示动态图案；低电时屏幕闪烁 --- 并通知 APP。"
-           data-en="Built-in Li-battery charging with animated display. Low battery triggers screen flash and app notification.">
-           锂电池内置充电，充电时显示动态图案；低电时屏幕闪烁 --- 并通知 APP。
-        </p>
-      </div>
-
-      <div class="feat-card fade-in fade-in-delay-3">
-        <div class="feat-icon"><i class="fa fa-clock"></i></div>
-        <h3 class="font-display font-semibold text-lg mb-2 cn" data-zh="时区 & 夏令时" data-en="Timezone & DST">时区 & 夏令时</h3>
-        <p style="color:var(--clr-muted);font-size:14px;line-height:1.7" class="cn"
-           data-zh="支持自动 DST 调整，也可手动开 / 关。祈祷时间误差可自定义 0–99 分钟。"
-           data-en="Auto or manual DST adjustment. Prayer time offset customizable from 0–99 minutes.">
-           支持自动 DST 调整，也可手动开 / 关。祈祷时间误差可自定义 0–99 分钟。
-        </p>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-
-<!-- ╔════════════════════════════════════╗ -->
-<!-- ║  INTERACTIVE TASBIH DEMO          ║ -->
-<!-- ╚════════════════════════════════════╝ -->
-<section id="tasbih-demo" class="py-16 px-4 md:px-8 islamic-bg" style="background:var(--clr-green);position:relative;">
-  <div class="max-w-4xl mx-auto text-center text-white relative z-10">
-    <div class="divider-gem"><span><i class="fa fa-circle-dot" style="color:var(--clr-gold)"></i></span></div>
-    <h2 class="font-arabic text-4xl mb-3 cn fade-in" data-zh="在线体验计数" data-en="Try the Counter">在线体验计数</h2>
-    <p class="text-white/60 mb-10 cn fade-in" data-zh="点击念珠感受智能计数功能" data-en="Click a bead to experience smart counting">点击念珠感受智能计数功能</p>
-
-    <!-- Channel selector -->
-    <div class="flex flex-wrap justify-center gap-3 mb-8">
-      <button onclick="setChannel(33)"  id="ch-33"  class="ch-btn px-5 py-2 rounded-full border border-gold-400 text-gold-400 font-display text-sm font-semibold transition hover:bg-gold-400 hover:text-green-950">33</button>
-      <button onclick="setChannel(66)"  id="ch-66"  class="ch-btn px-5 py-2 rounded-full border border-white/30 text-white/60 font-display text-sm font-semibold transition hover:border-gold-400 hover:text-gold-400">66</button>
-      <button onclick="setChannel(99)"  id="ch-99"  class="ch-btn px-5 py-2 rounded-full border border-white/30 text-white/60 font-display text-sm font-semibold transition hover:border-gold-400 hover:text-gold-400">99</button>
-      <button onclick="setChannel(100)" id="ch-100" class="ch-btn px-5 py-2 rounded-full border border-white/30 text-white/60 font-display text-sm font-semibold transition hover:border-gold-400 hover:text-gold-400">100</button>
-    </div>
-
-    <!-- Bead display -->
-    <div id="bead-grid" class="flex flex-wrap justify-center mb-8 max-w-sm mx-auto gap-1"></div>
-
-    <!-- Count display -->
-    <div class="flex justify-center gap-12 mb-8">
-      <div>
-        <div class="counter-display" id="tasbih-count">0</div>
-        <div class="text-white/50 text-sm font-display tracking-wider mt-1 cn" data-zh="当前计数" data-en="Current">当前计数</div>
-      </div>
-      <div>
-        <div class="counter-display" id="tasbih-laps">0</div>
-        <div class="text-white/50 text-sm font-display tracking-wider mt-1 cn" data-zh="圈数" data-en="Laps">圈数</div>
-      </div>
-      <div>
-        <div class="counter-display" id="tasbih-today">0</div>
-        <div class="text-white/50 text-sm font-display tracking-wider mt-1 cn" data-zh="今日总计" data-en="Today">今日总计</div>
-      </div>
-    </div>
-
-    <!-- Big tap button -->
-    <button onclick="tapCount()" id="tap-btn"
-      class="w-24 h-24 rounded-full mx-auto flex items-center justify-center text-3xl font-bold font-display transition active:scale-90"
-      style="background:var(--clr-gold);color:#0d2e1a;box-shadow:0 0 0 8px rgba(212,136,42,0.25);border:none;cursor:pointer;">
-      +
-    </button>
-    <p class="text-white/40 text-xs mt-4 font-display tracking-wider cn" data-zh="点击按钮或按空格键" data-en="Click button or press Space">点击按钮或按空格键</p>
-
-    <button onclick="resetCount()" class="mt-6 text-white/40 hover:text-white/70 text-sm font-display transition cn" data-zh="清零重置" data-en="Reset">清零重置</button>
-  </div>
-</section>
-
-
-<!-- ╔════════════════════════════════════╗ -->
-<!-- ║  APP SCREENSHOTS                   ║ -->
-<!-- ╚════════════════════════════════════╝ -->
-<section id="screenshots" class="py-20 px-4 md:px-8">
-  <div class="max-w-6xl mx-auto">
-
-    <div class="text-center mb-14 fade-in">
-      <div class="divider-gem"><span><i class="fa fa-mobile-alt"></i></span></div>
-      <h2 class="font-arabic text-4xl md:text-5xl mb-4 cn" data-zh="应用界面展示" data-en="App Screenshots">应用界面展示</h2>
-      <p style="color:var(--clr-muted)" class="max-w-xl mx-auto text-lg cn"
-         data-zh="简洁直观的操作界面，支持中英阿三语切换，适配所有设备。"
-         data-en="Clean, intuitive UI with Chinese, English, and Arabic language support — works on all devices.">
-        简洁直观的操作界面，支持中英阿三语切换，适配所有设备。
-      </p>
-    </div>
-
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
-      <div class="ss-card fade-in fade-in-delay-1">
-        <img src="/mnt/user-data/uploads/prayertime.png" alt="Prayer Times" class="w-full block">
-        <div class="p-3 text-center">
-          <p class="text-white text-xs font-display tracking-wider cn" data-zh="祈祷时间" data-en="Prayer Times">祈祷时间</p>
-        </div>
-      </div>
-      <div class="ss-card fade-in fade-in-delay-2">
-        <img src="/mnt/user-data/uploads/prayertimeadjust.png" alt="Time Adjust" class="w-full block">
-        <div class="p-3 text-center">
-          <p class="text-white text-xs font-display tracking-wider cn" data-zh="时间调整" data-en="Time Adjust">时间调整</p>
-        </div>
-      </div>
-      <div class="ss-card fade-in fade-in-delay-3">
-        <img src="/mnt/user-data/uploads/tabsih.png" alt="Tasbih" class="w-full block">
-        <div class="p-3 text-center">
-          <p class="text-white text-xs font-display tracking-wider cn" data-zh="Tasbih 计数" data-en="Tasbih Count">Tasbih 计数</p>
-        </div>
-      </div>
-      <div class="ss-card fade-in fade-in-delay-4">
-        <img src="/mnt/user-data/uploads/setting.png" alt="Settings" class="w-full block">
-        <div class="p-3 text-center">
-          <p class="text-white text-xs font-display tracking-wider cn" data-zh="设置页面" data-en="Settings">设置页面</p>
-        </div>
-      </div>
-      <div class="ss-card fade-in fade-in-delay-5">
-        <img src="/mnt/user-data/uploads/taqweem.png" alt="Taqweem" class="w-full block">
-        <div class="p-3 text-center">
-          <p class="text-white text-xs font-display tracking-wider cn" data-zh="祈祷算法" data-en="Algorithm">祈祷算法</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ╔════════════════════════════════════╗ -->
-<!-- ║  HOW IT WORKS                      ║ -->
-<!-- ╚════════════════════════════════════╝ -->
-<section id="howto" class="py-20 px-4 md:px-8" style="background:var(--clr-surface)">
-  <div class="max-w-5xl mx-auto">
-
-    <div class="text-center mb-14 fade-in">
-      <div class="divider-gem"><span><i class="fa fa-list-ol"></i></span></div>
-      <h2 class="font-arabic text-4xl md:text-5xl mb-4 cn" data-zh="使用步骤" data-en="How It Works">使用步骤</h2>
-      <p style="color:var(--clr-muted)" class="max-w-xl mx-auto text-lg cn"
-         data-zh="三步开始，简单高效"
-         data-en="Three steps to get started — simple and efficient.">
-        三步开始，简单高效
-      </p>
-    </div>
-
-    <div class="grid md:grid-cols-2 gap-10 items-start">
-
-      <!-- Steps list -->
-      <div class="space-y-8">
-
-        <div class="flex gap-4 items-start fade-in fade-in-delay-1">
-          <div class="step-num">1</div>
-          <div>
-            <h3 class="font-display font-semibold text-lg mb-1 cn" data-zh="开机连接" data-en="Power & Connect">开机连接</h3>
-            <p style="color:var(--clr-muted);font-size:14px;line-height:1.8" class="cn"
-               data-zh="短按按键开机，设备显示上次数值并开始搜索蓝牙。指示灯闪烁中；打开 APP 搜索「AL-FATIHA」并配对。"
-               data-en="Short-press to power on. Device shows last count and starts scanning. Open app, find 'AL-FATIHA', and pair.">
-               短按按键开机，设备显示上次数值并开始搜索蓝牙。指示灯闪烁中；打开 APP 搜索「AL-FATIHA」并配对。
-            </p>
-          </div>
-        </div>
-
-        <div class="flex gap-4 items-start fade-in fade-in-delay-2">
-          <div class="step-num">2</div>
-          <div>
-            <h3 class="font-display font-semibold text-lg mb-1 cn" data-zh="设置国家与城市" data-en="Set Location">设置国家与城市</h3>
-            <p style="color:var(--clr-muted);font-size:14px;line-height:1.8" class="cn"
-               data-zh="APP 默认定位当地位置自动获取祈祷时间；也可手动从 200 国 / 7000 城市中选择，设置完成后进入主菜单。"
-               data-en="App auto-detects your location. Or manually choose from 200 countries / 7,000 cities. Then enter the main menu.">
-               APP 默认定位当地位置自动获取祈祷时间；也可手动从 200 国 / 7000 城市中选择，设置完成后进入主菜单。
-            </p>
-          </div>
-        </div>
-
-        <div class="flex gap-4 items-start fade-in fade-in-delay-3">
-          <div class="step-num">3</div>
-          <div>
-            <h3 class="font-display font-semibold text-lg mb-1 cn" data-zh="开始 Tasbih" data-en="Start Tasbih">开始 Tasbih</h3>
-            <p style="color:var(--clr-muted);font-size:14px;line-height:1.8" class="cn"
-               data-zh="短按硬件按键计数，每计一次同步到 APP；达到通道倍数（33/66/99/100）自动振动并圈数加 1。长按 3 秒清零。"
-               data-en="Short-press the hardware button to count. Reaches cycle threshold → vibrate + lap+1. Long-press 3s to reset.">
-               短按硬件按键计数，每计一次同步到 APP；达到通道倍数（33/66/99/100）自动振动并圈数加 1。长按 3 秒清零。
-            </p>
-          </div>
-        </div>
-
-        <div class="flex gap-4 items-start fade-in fade-in-delay-4">
-          <div class="step-num">4</div>
-          <div>
-            <h3 class="font-display font-semibold text-lg mb-1 cn" data-zh="接收礼拜提醒" data-en="Receive Prayer Alert">接收礼拜提醒</h3>
-            <p style="color:var(--clr-muted);font-size:14px;line-height:1.8" class="cn"
-               data-zh="礼拜时间到，APP 自动推送振动指令，设备振动 5 次。设备 LED 屏显示当前礼拜名称代码（F/D/A/M/I）。"
-               data-en="At prayer time, app sends vibration command — device vibrates 5 times and shows prayer code (F/D/A/M/I) on LED.">
-               礼拜时间到，APP 自动推送振动指令，设备振动 5 次。设备 LED 屏显示当前礼拜名称代码（F/D/A/M/I）。
-            </p>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Prayer time card -->
-      <div class="prayer-band rounded-2xl p-6 fade-in fade-in-delay-2">
-        <div class="text-xs font-display tracking-widest text-white/50 mb-1 cn" data-zh="SALAT ZIKIR RING" data-en="SALAT ZIKIR RING">SALAT ZIKIR RING</div>
-        <div class="flex items-center gap-3 mb-1">
-          <div class="w-10 h-10 rounded-full border border-white/20 overflow-hidden bg-white/10 flex-shrink-0">
-            <img src="/mnt/user-data/uploads/logo.png" class="w-full h-full object-contain">
-          </div>
-          <div>
-            <div class="font-display font-bold text-2xl text-white">FAJR</div>
-            <div style="color:var(--clr-gold)" class="font-display font-bold text-xl">6:50 AM</div>
-          </div>
-        </div>
-
-        <div class="mt-4 mb-3 px-3 py-2 rounded-lg text-xs font-display tracking-wider text-white/50 border border-white/10 cn"
-             data-zh="下一个祈祷时间" data-en="Next Islamic Prayer Times">下一个祈祷时间</div>
-        <div class="flex items-center justify-between mb-3 px-2">
-          <span class="font-display font-bold text-white text-sm">SHUROQ</span>
-          <span style="color:var(--clr-gold)" class="font-display font-bold text-lg">7:25 AM</span>
-        </div>
-
-        <div id="prayer-list" class="mt-2"></div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-
-<!-- ╔════════════════════════════════════╗ -->
-<!-- ║  SPECS                             ║ -->
-<!-- ╚════════════════════════════════════╝ -->
-<section id="specs" class="py-20 px-4 md:px-8">
-  <div class="max-w-5xl mx-auto">
-
-    <div class="text-center mb-14 fade-in">
-      <div class="divider-gem"><span><i class="fa fa-microchip"></i></span></div>
-      <h2 class="font-arabic text-4xl md:text-5xl mb-4 cn" data-zh="产品规格" data-en="Product Specs">产品规格</h2>
-    </div>
-
-    <div class="grid md:grid-cols-2 gap-8">
-
-      <!-- Hardware -->
-      <div class="feat-card fade-in fade-in-delay-1">
-        <h3 class="font-display font-semibold text-base tracking-widest uppercase mb-4 gold cn" data-zh="硬件规格" data-en="Hardware">硬件规格</h3>
-        <div class="spec-row"><span class="spec-label cn" data-zh="显示" data-en="Display">显示</span><span class="spec-val cn" data-zh="LED 三位数码管 + 3 指示灯" data-en="LED 3-digit + 3 indicator lights">LED 三位数码管 + 3 指示灯</span></div>
-        <div class="spec-row"><span class="spec-label cn" data-zh="按键" data-en="Button">按键</span><span class="spec-val cn" data-zh="单按键（短按计数 / 长按 3 秒清零）" data-en="Single key (short press count / long press reset)">单按键（短按计数 / 长按 3 秒清零）</span></div>
-        <div class="spec-row"><span class="spec-label cn" data-zh="振动马达" data-en="Motor">振动马达</span><span class="spec-val cn" data-zh="内置振动马达，振动 0.5 秒 / 次" data-en="Built-in, 0.5s per vibration">内置振动马达，振动 0.5 秒 / 次</span></div>
-        <div class="spec-row"><span class="spec-label cn" data-zh="电池" data-en="Battery">电池</span><span class="spec-val cn" data-zh="内置锂电池，USB 充电" data-en="Built-in Li-battery, USB charging">内置锂电池，USB 充电</span></div>
-        <div class="spec-row"><span class="spec-label cn" data-zh="蓝牙名称" data-en="BT Name">蓝牙名称</span><span class="spec-val">AL-FATIHA</span></div>
-        <div class="spec-row"><span class="spec-label cn" data-zh="省电" data-en="Auto-off">省电</span><span class="spec-val cn" data-zh="30 秒无操作熄屏，10 分钟无操作自动关机" data-en="30s no-op dim, 10min auto-off">30 秒无操作熄屏，10 分钟关机</span></div>
-      </div>
-
-      <!-- Software -->
-      <div class="feat-card fade-in fade-in-delay-2">
-        <h3 class="font-display font-semibold text-base tracking-widest uppercase mb-4 gold cn" data-zh="软件规格" data-en="Software">软件规格</h3>
-        <div class="spec-row"><span class="spec-label cn" data-zh="平台" data-en="Platform">平台</span><span class="spec-val">iOS & Android</span></div>
-        <div class="spec-row"><span class="spec-label cn" data-zh="语言" data-en="Language">语言</span><span class="spec-val cn" data-zh="英文 / 阿拉伯文 / 中文" data-en="English / Arabic / Chinese">英文 / 阿拉伯文 / 中文</span></div>
-        <div class="spec-row"><span class="spec-label cn" data-zh="城市数据" data-en="City Data">城市数据</span><span class="spec-val cn" data-zh="200 国家 / 7000 城市" data-en="200 countries / 7,000 cities">200 国家 / 7000 城市</span></div>
-        <div class="spec-row"><span class="spec-label cn" data-zh="计算算法" data-en="Algorithm">计算算法</span><span class="spec-val cn" data-zh="6 种算法（含穆斯林世界联盟）" data-en="6 methods incl. Muslim World League">6 种（含穆斯林世界联盟）</span></div>
-        <div class="spec-row"><span class="spec-label cn" data-zh="通道" data-en="Channels">通道</span><span class="spec-val">33 · 66 · 99 · 100</span></div>
-        <div class="spec-row"><span class="spec-label cn" data-zh="时间调整" data-en="Time Adjust">时间调整</span><span class="spec-val cn" data-zh="±0–99 分钟，支持 DST 自动/手动" data-en="±0–99 min, Auto/Manual DST">±0–99 分钟，Auto/Manual DST</span></div>
-      </div>
-
-    </div>
-
-    <!-- Prayer names -->
-    <div class="mt-10 fade-in">
-      <h3 class="font-display font-semibold text-center mb-6 tracking-widest uppercase text-sm gold cn" data-zh="五次礼拜显示代码" data-en="5 Prayer Display Codes">五次礼拜显示代码</h3>
-      <div class="grid grid-cols-5 gap-3">
-        <div class="text-center py-4 rounded-xl" style="background:var(--clr-surface);border:1px solid rgba(46,125,82,0.2)">
-          <div class="font-display font-bold text-2xl gold">F</div>
-          <div class="text-xs mt-1 font-display" style="color:var(--clr-muted)">FAJR</div>
-        </div>
-        <div class="text-center py-4 rounded-xl" style="background:var(--clr-surface);border:1px solid rgba(46,125,82,0.2)">
-          <div class="font-display font-bold text-2xl gold">D</div>
-          <div class="text-xs mt-1 font-display" style="color:var(--clr-muted)">DHUHR</div>
-        </div>
-        <div class="text-center py-4 rounded-xl" style="background:var(--clr-surface);border:1px solid rgba(46,125,82,0.2)">
-          <div class="font-display font-bold text-2xl gold">A</div>
-          <div class="text-xs mt-1 font-display" style="color:var(--clr-muted)">ASR</div>
-        </div>
-        <div class="text-center py-4 rounded-xl" style="background:var(--clr-surface);border:1px solid rgba(46,125,82,0.2)">
-          <div class="font-display font-bold text-2xl gold">M</div>
-          <div class="text-xs mt-1 font-display" style="color:var(--clr-muted)">MAGHRIB</div>
-        </div>
-        <div class="text-center py-4 rounded-xl" style="background:var(--clr-surface);border:1px solid rgba(46,125,82,0.2)">
-          <div class="font-display font-bold text-2xl gold">I</div>
-          <div class="text-xs mt-1 font-display" style="color:var(--clr-muted)">ISHA</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ╔════════════════════════════════════╗ -->
-<!-- ║  FAQ                               ║ -->
-<!-- ╚════════════════════════════════════╝ -->
-<section id="faq" class="py-20 px-4 md:px-8" style="background:var(--clr-surface)">
-  <div class="max-w-3xl mx-auto">
-
-    <div class="text-center mb-14 fade-in">
-      <div class="divider-gem"><span><i class="fa fa-circle-question"></i></span></div>
-      <h2 class="font-arabic text-4xl md:text-5xl mb-4 cn" data-zh="常见问题" data-en="FAQs">常见问题</h2>
-      <p style="color:var(--clr-muted)" class="max-w-xl mx-auto text-lg cn"
-         data-zh="点击问题查看详细解答" data-en="Click a question to expand the answer">
-        点击问题查看详细解答
-      </p>
-    </div>
-
-    <div class="space-y-3" id="faq-list">
-
-      <!-- FAQ Item 1 -->
-      <div class="faq-item feat-card cursor-pointer fade-in fade-in-delay-1" onclick="toggleFaq(this)">
-        <div class="flex items-center justify-between gap-4">
-          <div>
-            <p class="font-display font-semibold text-base cn"
-               data-zh="硬件无法与 APP 配对怎么办？"
-               data-en="What if the hardware cannot pair with the APP?">
-               硬件无法与 APP 配对怎么办？
-            </p>
-            <p class="text-xs mt-0.5 font-display" style="color:var(--clr-muted)">
-              Q: What if the hardware cannot pair with the APP?
-            </p>
-          </div>
-          <i class="fa fa-chevron-down faq-icon gold flex-shrink-0 transition-transform duration-300" style="font-size:14px"></i>
-        </div>
-        <div class="faq-answer hidden mt-4 pt-4" style="border-top:1px solid rgba(46,125,82,0.15)">
-          <div class="text-sm leading-relaxed space-y-2" style="color:var(--clr-muted)">
-            <p class="cn font-semibold mb-2" style="color:var(--clr-text)" data-zh="中文解答：" data-en="Answer:">中文解答：</p>
-            <p class="cn" data-zh="① 确认硬件已开机且指示灯闪烁（蓝牙搜索中）；<br>② 确认手机蓝牙已开启并授予 APP 蓝牙权限；<br>③ 确认手机与硬件距离在 10 米内，无其他蓝牙设备干扰；<br>④ 重启硬件与 APP 后重新搜索配对。"
-                data-en="① Confirm the hardware is powered on and the indicator light is flashing (Bluetooth searching);<br>② Confirm the phone's Bluetooth is on and the APP is granted Bluetooth permission;<br>③ Confirm the distance between the phone and the hardware is within 10 meters without interference from other Bluetooth devices;<br>④ Restart the hardware and APP and search for pairing again.">
-              ① 确认硬件已开机且指示灯闪烁（蓝牙搜索中）；<br>② 确认手机蓝牙已开启并授予 APP 蓝牙权限；<br>③ 确认手机与硬件距离在 10 米内，无其他蓝牙设备干扰；<br>④ 重启硬件与 APP 后重新搜索配对。
-            </p>
-            <p class="mt-3 pt-3 font-semibold text-xs font-display tracking-wider" style="border-top:1px dashed rgba(46,125,82,0.2);color:var(--clr-text)">EN:</p>
-            <p style="font-size:13px">① Confirm the hardware is powered on and the indicator light is flashing; ② Confirm Bluetooth is on and the APP has Bluetooth permission; ③ Ensure distance is within 10 meters, no interference; ④ Restart hardware and APP then search again.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- FAQ Item 2 -->
-      <div class="faq-item feat-card cursor-pointer fade-in fade-in-delay-2" onclick="toggleFaq(this)">
-        <div class="flex items-center justify-between gap-4">
-          <div>
-            <p class="font-display font-semibold text-base cn"
-               data-zh="祈祷时间为何不自动切换？"
-               data-en="Why doesn't the prayer time switch automatically?">
-               祈祷时间为何不自动切换？
-            </p>
-            <p class="text-xs mt-0.5 font-display" style="color:var(--clr-muted)">
-              Q: Why doesn't the prayer time switch automatically?
-            </p>
-          </div>
-          <i class="fa fa-chevron-down faq-icon gold flex-shrink-0 transition-transform duration-300" style="font-size:14px"></i>
-        </div>
-        <div class="faq-answer hidden mt-4 pt-4" style="border-top:1px solid rgba(46,125,82,0.15)">
-          <div class="text-sm leading-relaxed space-y-2" style="color:var(--clr-muted)">
-            <p class="cn font-semibold mb-2" style="color:var(--clr-text)" data-zh="中文解答：" data-en="Answer:">中文解答：</p>
-            <p class="cn" data-zh="① 确认 APP 已定位到正确的本地位置或手动选择了正确的国家/城市；<br>② 确认 DST 设置与当地夏令时规则一致；<br>③ 检查祈祷时间误差调整是否设置合理，重启 APP 后重新加载数据。"
-                data-en="① Confirm the APP has located the correct local location or manually selected the correct country/city;<br>② Confirm the DST setting is consistent with the local daylight saving time rules;<br>③ Check if the prayer time error adjustment is set reasonably, and reload the data after restarting the APP.">
-              ① 确认 APP 已定位到正确的本地位置或手动选择了正确的国家/城市；<br>② 确认 DST 设置与当地夏令时规则一致；<br>③ 检查祈祷时间误差调整是否设置合理，重启 APP 后重新加载数据。
-            </p>
-            <p class="mt-3 pt-3 font-semibold text-xs font-display tracking-wider" style="border-top:1px dashed rgba(46,125,82,0.2);color:var(--clr-text)">EN:</p>
-            <p style="font-size:13px">① Confirm the APP has the correct location set; ② Confirm DST settings match local rules; ③ Check prayer time offset adjustment, then restart APP to reload data.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- FAQ Item 3 -->
-      <div class="faq-item feat-card cursor-pointer fade-in fade-in-delay-3" onclick="toggleFaq(this)">
-        <div class="flex items-center justify-between gap-4">
-          <div>
-            <p class="font-display font-semibold text-base cn"
-               data-zh="计数达到通道倍数后无振动提醒？"
-               data-en="No vibration when count reaches the channel multiple?">
-               计数达到通道倍数后无振动提醒？
-            </p>
-            <p class="text-xs mt-0.5 font-display" style="color:var(--clr-muted)">
-              Q: No vibration reminder when the count reaches the channel multiple?
-            </p>
-          </div>
-          <i class="fa fa-chevron-down faq-icon gold flex-shrink-0 transition-transform duration-300" style="font-size:14px"></i>
-        </div>
-        <div class="faq-answer hidden mt-4 pt-4" style="border-top:1px solid rgba(46,125,82,0.15)">
-          <div class="text-sm leading-relaxed space-y-2" style="color:var(--clr-muted)">
-            <p class="cn font-semibold mb-2" style="color:var(--clr-text)" data-zh="中文解答：" data-en="Answer:">中文解答：</p>
-            <p class="cn" data-zh="① 确认硬件与 APP 已成功蓝牙连接；<br>② 检查 APP 中通道设置是否选择正确；<br>③ 确认硬件电量充足，低电状态下部分功能会受限，充电后重试。"
-                data-en="① Confirm the hardware and APP have successfully connected via Bluetooth;<br>② Check if the channel setting in the APP is selected correctly;<br>③ Confirm the hardware has sufficient battery power, some functions are limited in low battery state, try again after charging.">
-              ① 确认硬件与 APP 已成功蓝牙连接；<br>② 检查 APP 中通道设置是否选择正确；<br>③ 确认硬件电量充足，低电状态下部分功能会受限，充电后重试。
-            </p>
-            <p class="mt-3 pt-3 font-semibold text-xs font-display tracking-wider" style="border-top:1px dashed rgba(46,125,82,0.2);color:var(--clr-text)">EN:</p>
-            <p style="font-size:13px">① Confirm Bluetooth connection is active; ② Check channel setting in APP; ③ Ensure battery is sufficient — some functions are limited when low, try after charging.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- FAQ Item 4 -->
-      <div class="faq-item feat-card cursor-pointer fade-in fade-in-delay-1" onclick="toggleFaq(this)">
-        <div class="flex items-center justify-between gap-4">
-          <div>
-            <p class="font-display font-semibold text-base cn"
-               data-zh="APP 支持哪些手机系统版本？"
-               data-en="Which mobile system versions does the APP support?">
-               APP 支持哪些手机系统版本？
-            </p>
-            <p class="text-xs mt-0.5 font-display" style="color:var(--clr-muted)">
-              Q: Which mobile system versions does the APP support?
-            </p>
-          </div>
-          <i class="fa fa-chevron-down faq-icon gold flex-shrink-0 transition-transform duration-300" style="font-size:14px"></i>
-        </div>
-        <div class="faq-answer hidden mt-4 pt-4" style="border-top:1px solid rgba(46,125,82,0.15)">
-          <div class="text-sm leading-relaxed space-y-2" style="color:var(--clr-muted)">
-            <p class="cn font-semibold mb-2" style="color:var(--clr-text)" data-zh="中文解答：" data-en="Answer:">中文解答：</p>
-            <p class="cn"
-               data-zh="苹果 iOS 需 11.0 及以上版本，安卓 Android 需 8.0 及以上版本，确保手机系统版本达标以保证 APP 正常运行。"
-               data-en="Apple iOS requires version 11.0 and above, Android requires version 8.0 and above, ensure the mobile system version meets the standard to ensure the normal operation of the APP.">
-              苹果 iOS 需 11.0 及以上版本，安卓 Android 需 8.0 及以上版本，确保手机系统版本达标以保证 APP 正常运行。
-            </p>
-            <p class="mt-3 pt-3 font-semibold text-xs font-display tracking-wider" style="border-top:1px dashed rgba(46,125,82,0.2);color:var(--clr-text)">EN:</p>
-            <p style="font-size:13px">Apple iOS 11.0+, Android 8.0+. Ensure your system meets the requirement for the APP to function correctly.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- FAQ Item 5 -->
-      <div class="faq-item feat-card cursor-pointer fade-in fade-in-delay-2" onclick="toggleFaq(this)">
-        <div class="flex items-center justify-between gap-4">
-          <div>
-            <p class="font-display font-semibold text-base cn"
-               data-zh="当日总计数如何清零？"
-               data-en="How to reset the daily total count?">
-               当日总计数如何清零？
-            </p>
-            <p class="text-xs mt-0.5 font-display" style="color:var(--clr-muted)">
-              Q: How to reset the daily total count?
-            </p>
-          </div>
-          <i class="fa fa-chevron-down faq-icon gold flex-shrink-0 transition-transform duration-300" style="font-size:14px"></i>
-        </div>
-        <div class="faq-answer hidden mt-4 pt-4" style="border-top:1px solid rgba(46,125,82,0.15)">
-          <div class="text-sm leading-relaxed space-y-2" style="color:var(--clr-muted)">
-            <p class="cn font-semibold mb-2" style="color:var(--clr-text)" data-zh="中文解答：" data-en="Answer:">中文解答：</p>
-            <p class="cn"
-               data-zh="在 APP 计数主页面点击「清除」按钮，可一键清零当日总计数；当日总计数会在每日 00:00 自动清零，无需手动操作。"
-               data-en="Click the "Clear" button on the APP counting main page to reset the daily total count with one click; the daily total count will be automatically reset at 00:00 every day without manual operation.">
-              在 APP 计数主页面点击「清除」按钮，可一键清零当日总计数；当日总计数会在每日 00:00 自动清零，无需手动操作。
-            </p>
-            <p class="mt-3 pt-3 font-semibold text-xs font-display tracking-wider" style="border-top:1px dashed rgba(46,125,82,0.2);color:var(--clr-text)">EN:</p>
-            <p style="font-size:13px">Tap the "Clear" button on the counting page to reset instantly. The daily total also resets automatically at 00:00 every day — no manual action needed.</p>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-
-<!-- ╔════════════════════════════════════╗ -->
-<!-- ║  CONTACT US                        ║ -->
-<!-- ╚════════════════════════════════════╝ -->
-<section id="contact" class="py-20 px-4 md:px-8 islamic-bg" style="background:var(--clr-green);position:relative;">
-  <div class="max-w-6xl mx-auto relative z-10">
-
-    <div class="text-center mb-14 fade-in">
-      <div class="divider-gem"><span><i class="fa fa-envelope" style="color:var(--clr-gold)"></i></span></div>
-      <h2 class="font-arabic text-4xl md:text-5xl mb-4 text-white cn" data-zh="联系我们" data-en="Contact Us">联系我们</h2>
-      <p class="text-white/60 max-w-xl mx-auto text-lg cn"
-         data-zh="我们随时准备为您提供支持，请通过以下方式联系我们。"
-         data-en="We are always ready to support you. Please reach us through the channels below.">
-        我们随时准备为您提供支持，请通过以下方式联系我们。
-      </p>
-    </div>
-
-    <div class="grid md:grid-cols-2 gap-10 items-start">
-
-      <!-- Contact Info -->
-      <div class="fade-in fade-in-delay-1">
-        <h3 class="font-display font-semibold tracking-widest text-sm uppercase mb-6" style="color:var(--clr-gold)" class="cn" data-zh="联系信息 / Contact Information">联系信息 / Contact Information</h3>
-
-        <div class="space-y-5">
-          <div class="flex items-start gap-4">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(255,255,255,0.08)">
-              <i class="fa fa-envelope" style="color:var(--clr-gold)"></i>
+            智能蓝牙<br>Tasbih 计数器
+          </h1>
+
+          <p class="text-white/70 text-lg md:text-xl leading-relaxed mb-8 max-w-lg cn"
+            data-zh="结合传统礼拜与现代科技。S01 蓝牙计数器连接手机 APP，精准记录每一次念珠，随时掌握祈祷时间与计数圈数。"
+            data-en="Bridging tradition and technology. The S01 Bluetooth Tasbih syncs with your phone app to track every bead, prayer time, and cycle count in real time.">
+            结合传统礼拜与现代科技。S01 蓝牙计数器连接手机 APP，精准记录每一次念珠，随时掌握祈祷时间与计数圈数。
+          </p>
+
+          <!-- Stats row -->
+          <div class="flex flex-wrap gap-8 mb-10">
+            <div>
+              <div class="counter-display" data-target="200">0</div>
+              <div class="text-white/50 text-sm font-display tracking-wider mt-1 cn" data-zh="个国家" data-en="Countries">
+                个国家</div>
             </div>
             <div>
-              <p class="text-white/50 text-xs font-display tracking-wider mb-0.5 cn" data-zh="客服邮箱" data-en="Customer Service Email">客服邮箱 / Customer Service Email</p>
-              <a href="mailto:support@alfatiha-tasbih.com" class="text-white font-display text-sm hover:underline" style="color:var(--clr-gold)">support@alfatiha-tasbih.com</a>
+              <div class="counter-display" data-target="7000">0</div>
+              <div class="text-white/50 text-sm font-display tracking-wider mt-1 cn" data-zh="个城市" data-en="Cities">个城市
+              </div>
+            </div>
+            <div>
+              <div class="counter-display">5</div>
+              <div class="text-white/50 text-sm font-display tracking-wider mt-1 cn" data-zh="次祈祷提醒"
+                data-en="Prayer Alerts">次祈祷提醒</div>
             </div>
           </div>
 
-          <div class="flex items-start gap-4">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(255,255,255,0.08)">
-              <i class="fa fa-phone" style="color:var(--clr-gold)"></i>
-            </div>
-            <div>
-              <p class="text-white/50 text-xs font-display tracking-wider mb-0.5 cn" data-zh="客服电话" data-en="Customer Service Phone">客服电话 / Customer Service Phone</p>
-              <p class="text-white font-display text-sm">+XX XXXXX XXXXX</p>
-            </div>
+          <!-- CTA -->
+          <div class="flex flex-wrap gap-4">
+            <a href="#download" class="dl-btn dl-android">
+              <i class="fab fa-google-play text-lg"></i>
+              <span class="cn" data-zh="Android 下载" data-en="Android Download">Android 下载</span>
+            </a>
+            <a href="#download" class="dl-btn dl-ios">
+              <i class="fab fa-apple text-lg"></i>
+              <span class="cn" data-zh="iOS 下载" data-en="iOS Download">iOS 下载</span>
+            </a>
           </div>
+        </div>
 
-          <div class="flex items-start gap-4">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(255,255,255,0.08)">
-              <i class="fa fa-clock" style="color:var(--clr-gold)"></i>
-            </div>
+        <!-- Phone Mockups -->
+        <div class="flex justify-center md:justify-end items-end gap-4 md:gap-6">
+          <div class="phone-frame" style="transform: rotate(-4deg) translateY(24px);">
+            <img src="./img/prayertime.png" alt="Prayer Time Screen" class="w-full block">
+          </div>
+          <div class="phone-frame" style="transform: rotate(3deg);">
+            <img src="./img/tabsih.png" alt="Tasbih Screen" class="w-full block">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40">
+      <span class="text-xs font-display tracking-widest uppercase cn" data-zh="向下滚动" data-en="Scroll">向下滚动</span>
+      <div class="w-px h-8 bg-gradient-to-b from-white/40 to-transparent animate-bounce"></div>
+    </div>
+  </section>
+
+
+  <!-- ╔════════════════════════════════════╗ -->
+  <!-- ║  BRAND BAND                        ║ -->
+  <!-- ╚════════════════════════════════════╝ -->
+  <div class="prayer-band py-4 px-4">
+    <div
+      class="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-6 md:gap-12 text-white/60 font-display text-sm tracking-widest uppercase">
+      <div class="flex items-center gap-2"><i class="fa fa-bluetooth text-gold-400"></i><span class="cn"
+          data-zh="蓝牙 5.0 连接" data-en="Bluetooth 5.0">蓝牙 5.0 连接</span></div>
+      <div class="flex items-center gap-2"><i class="fa fa-bell text-gold-400"></i><span class="cn" data-zh="振动提醒"
+          data-en="Vibration Alert">振动提醒</span></div>
+      <div class="flex items-center gap-2"><i class="fa fa-battery-three-quarters text-gold-400"></i><span class="cn"
+          data-zh="可充电电池" data-en="Rechargeable">可充电电池</span></div>
+      <div class="flex items-center gap-2"><i class="fa fa-mobile-alt text-gold-400"></i><span class="cn"
+          data-zh="iOS & Android" data-en="iOS & Android">iOS & Android</span></div>
+      <div class="flex items-center gap-2"><i class="fa fa-globe text-gold-400"></i><span class="cn" data-zh="7000 城市数据"
+          data-en="7000 Cities">7000 城市数据</span></div>
+    </div>
+  </div>
+
+
+  <!-- ╔════════════════════════════════════╗ -->
+  <!-- ║  FEATURES                          ║ -->
+  <!-- ╚════════════════════════════════════╝ -->
+  <section id="features" class="py-20 px-4 md:px-8">
+    <div class="max-w-6xl mx-auto">
+
+      <div class="text-center mb-14 fade-in">
+        <div class="divider-gem"><span><i class="fa fa-star"></i></span></div>
+        <h2 class="font-arabic text-4xl md:text-5xl mb-4 cn" data-zh="核心功能" data-en="Core Features">核心功能</h2>
+        <p class="text-muted max-w-xl mx-auto text-lg cn" style="color:var(--clr-muted)"
+          data-zh="专为穆斯林信徒打造，融合智能硬件与手机应用，让每次念珠都被精准记录。"
+          data-en="Designed for Muslim practitioners — intelligent hardware meets mobile app for precise bead tracking.">
+          专为穆斯林信徒打造，融合智能硬件与手机应用，让每次念珠都被精准记录。
+        </p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- Feature cards -->
+        <div class="feat-card fade-in fade-in-delay-1">
+          <div class="feat-icon"><i class="fab fa-bluetooth-b"></i></div>
+          <h3 class="font-display font-semibold text-lg mb-2 cn" data-zh="蓝牙双向通信" data-en="Bluetooth Two-Way">蓝牙双向通信
+          </h3>
+          <p style="color:var(--clr-muted);font-size:14px;line-height:1.7" class="cn"
+            data-zh="设备名称 AL-FATIHA，与 APP 实时双向同步，计数、状态、电量全部同步显示。"
+            data-en="Device name AL-FATIHA, real-time two-way sync — count, status, and battery all synced instantly.">
+            设备名称 AL-FATIHA，与 APP 实时双向同步，计数、状态、电量全部同步显示。
+          </p>
+        </div>
+
+        <div class="feat-card fade-in fade-in-delay-2">
+          <div class="feat-icon"><i class="fa fa-kaaba"></i></div>
+          <h3 class="font-display font-semibold text-lg mb-2 cn" data-zh="完整祈祷时间" data-en="Full Prayer Times">完整祈祷时间
+          </h3>
+          <p style="color:var(--clr-muted);font-size:14px;line-height:1.7" class="cn"
+            data-zh="覆盖 200 个国家、7000 个城市的祈祷时间数据，支持 GPS 自动定位计算。六种算法可选。"
+            data-en="Prayer time data for 200 countries and 7,000 cities, with GPS auto-location and 6 calculation methods.">
+            覆盖 200 个国家、7000 个城市的祈祷时间数据，支持 GPS 自动定位计算。六种算法可选。
+          </p>
+        </div>
+
+        <div class="feat-card fade-in fade-in-delay-3">
+          <div class="feat-icon"><i class="fa fa-hand-point-up"></i></div>
+          <h3 class="font-display font-semibold text-lg mb-2 cn" data-zh="Tasbih 智能计数" data-en="Smart Tasbih Count">
+            Tasbih 智能计数</h3>
+          <p style="color:var(--clr-muted);font-size:14px;line-height:1.7" class="cn"
+            data-zh="支持 33 / 66 / 99 / 100 四个通道，到达倍数自动振动提醒，圈数自动累加。"
+            data-en="4 channels: 33/66/99/100. Vibrates at each cycle complete, lap count auto-increments.">
+            支持 33 / 66 / 99 / 100 四个通道，到达倍数自动振动提醒，圈数自动累加。
+          </p>
+        </div>
+
+        <div class="feat-card fade-in fade-in-delay-1">
+          <div class="feat-icon"><i class="fa fa-mobile-alt"></i></div>
+          <h3 class="font-display font-semibold text-lg mb-2 cn" data-zh="振动礼拜提醒" data-en="Prayer Vibration Alert">
+            振动礼拜提醒</h3>
+          <p style="color:var(--clr-muted);font-size:14px;line-height:1.7" class="cn"
+            data-zh="礼拜时间到，APP 发送指令，设备振动 5 次提醒，支持开关静音模式。"
+            data-en="When prayer time arrives, the app sends a command — device vibrates 5 times. Silence mode supported.">
+            礼拜时间到，APP 发送指令，设备振动 5 次提醒，支持开关静音模式。
+          </p>
+        </div>
+
+        <div class="feat-card fade-in fade-in-delay-2">
+          <div class="feat-icon"><i class="fa fa-battery-full"></i></div>
+          <h3 class="font-display font-semibold text-lg mb-2 cn" data-zh="充电 & 低电提示" data-en="Charging & Low Battery">充电
+            & 低电提示</h3>
+          <p style="color:var(--clr-muted);font-size:14px;line-height:1.7" class="cn"
+            data-zh="锂电池内置充电，充电时显示动态图案；低电时屏幕闪烁 --- 并通知 APP。"
+            data-en="Built-in Li-battery charging with animated display. Low battery triggers screen flash and app notification.">
+            锂电池内置充电，充电时显示动态图案；低电时屏幕闪烁 --- 并通知 APP。
+          </p>
+        </div>
+
+        <div class="feat-card fade-in fade-in-delay-3">
+          <div class="feat-icon"><i class="fa fa-clock"></i></div>
+          <h3 class="font-display font-semibold text-lg mb-2 cn" data-zh="时区 & 夏令时" data-en="Timezone & DST">时区 & 夏令时
+          </h3>
+          <p style="color:var(--clr-muted);font-size:14px;line-height:1.7" class="cn"
+            data-zh="支持自动 DST 调整，也可手动开 / 关。祈祷时间误差可自定义 0–99 分钟。"
+            data-en="Auto or manual DST adjustment. Prayer time offset customizable from 0–99 minutes.">
+            支持自动 DST 调整，也可手动开 / 关。祈祷时间误差可自定义 0–99 分钟。
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ╔════════════════════════════════════╗ -->
+  <!-- ║  INTERACTIVE TASBIH DEMO          ║ -->
+  <!-- ╚════════════════════════════════════╝ -->
+  <section id="tasbih-demo" class="py-16 px-4 md:px-8 islamic-bg"
+    style="background:var(--clr-green);position:relative;">
+    <div class="max-w-4xl mx-auto text-center text-white relative z-10">
+      <div class="divider-gem"><span><i class="fa fa-circle-dot" style="color:var(--clr-gold)"></i></span></div>
+      <h2 class="font-arabic text-4xl mb-3 cn fade-in" data-zh="在线体验计数" data-en="Try the Counter">在线体验计数</h2>
+      <p class="text-white/60 mb-10 cn fade-in" data-zh="点击念珠感受智能计数功能"
+        data-en="Click a bead to experience smart counting">点击念珠感受智能计数功能</p>
+
+      <!-- Channel selector -->
+      <div class="flex flex-wrap justify-center gap-3 mb-8">
+        <button onclick="setChannel(33)" id="ch-33"
+          class="ch-btn px-5 py-2 rounded-full border border-gold-400 text-gold-400 font-display text-sm font-semibold transition hover:bg-gold-400 hover:text-green-950">33</button>
+        <button onclick="setChannel(66)" id="ch-66"
+          class="ch-btn px-5 py-2 rounded-full border border-white/30 text-white/60 font-display text-sm font-semibold transition hover:border-gold-400 hover:text-gold-400">66</button>
+        <button onclick="setChannel(99)" id="ch-99"
+          class="ch-btn px-5 py-2 rounded-full border border-white/30 text-white/60 font-display text-sm font-semibold transition hover:border-gold-400 hover:text-gold-400">99</button>
+        <button onclick="setChannel(100)" id="ch-100"
+          class="ch-btn px-5 py-2 rounded-full border border-white/30 text-white/60 font-display text-sm font-semibold transition hover:border-gold-400 hover:text-gold-400">100</button>
+      </div>
+
+      <!-- Bead display -->
+      <div id="bead-grid" class="flex flex-wrap justify-center mb-8 max-w-sm mx-auto gap-1"></div>
+
+      <!-- Count display -->
+      <div class="flex justify-center gap-12 mb-8">
+        <div>
+          <div class="counter-display" id="tasbih-count">0</div>
+          <div class="text-white/50 text-sm font-display tracking-wider mt-1 cn" data-zh="当前计数" data-en="Current">当前计数
+          </div>
+        </div>
+        <div>
+          <div class="counter-display" id="tasbih-laps">0</div>
+          <div class="text-white/50 text-sm font-display tracking-wider mt-1 cn" data-zh="圈数" data-en="Laps">圈数</div>
+        </div>
+        <div>
+          <div class="counter-display" id="tasbih-today">0</div>
+          <div class="text-white/50 text-sm font-display tracking-wider mt-1 cn" data-zh="今日总计" data-en="Today">今日总计
+          </div>
+        </div>
+      </div>
+
+      <!-- Big tap button -->
+      <button onclick="tapCount()" id="tap-btn"
+        class="w-24 h-24 rounded-full mx-auto flex items-center justify-center text-3xl font-bold font-display transition active:scale-90"
+        style="background:var(--clr-gold);color:#0d2e1a;box-shadow:0 0 0 8px rgba(212,136,42,0.25);border:none;cursor:pointer;">
+        +
+      </button>
+      <p class="text-white/40 text-xs mt-4 font-display tracking-wider cn" data-zh="点击按钮或按空格键"
+        data-en="Click button or press Space">点击按钮或按空格键</p>
+
+      <button onclick="resetCount()" class="mt-6 text-white/40 hover:text-white/70 text-sm font-display transition cn"
+        data-zh="清零重置" data-en="Reset">清零重置</button>
+    </div>
+  </section>
+
+
+  <!-- ╔════════════════════════════════════╗ -->
+  <!-- ║  APP SCREENSHOTS                   ║ -->
+  <!-- ╚════════════════════════════════════╝ -->
+  <section id="screenshots" class="py-20 px-4 md:px-8">
+    <div class="max-w-6xl mx-auto">
+
+      <div class="text-center mb-14 fade-in">
+        <div class="divider-gem"><span><i class="fa fa-mobile-alt"></i></span></div>
+        <h2 class="font-arabic text-4xl md:text-5xl mb-4 cn" data-zh="应用界面展示" data-en="App Screenshots">应用界面展示</h2>
+        <p style="color:var(--clr-muted)" class="max-w-xl mx-auto text-lg cn" data-zh="简洁直观的操作界面，支持中英阿三语切换，适配所有设备。"
+          data-en="Clean, intuitive UI with Chinese, English, and Arabic language support — works on all devices.">
+          简洁直观的操作界面，支持中英阿三语切换，适配所有设备。
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+        <div class="ss-card fade-in fade-in-delay-1">
+          <img src="./img/prayertime.png" alt="Prayer Times" class="w-full block">
+          <div class="p-3 text-center">
+            <p class="text-white text-xs font-display tracking-wider cn" data-zh="祈祷时间" data-en="Prayer Times">祈祷时间</p>
+          </div>
+        </div>
+        <div class="ss-card fade-in fade-in-delay-2">
+          <img src="./img/prayertimeadjust.png" alt="Time Adjust" class="w-full block">
+          <div class="p-3 text-center">
+            <p class="text-white text-xs font-display tracking-wider cn" data-zh="时间调整" data-en="Time Adjust">时间调整</p>
+          </div>
+        </div>
+        <div class="ss-card fade-in fade-in-delay-3">
+          <img src="./img/tabsih.png" alt="Tasbih" class="w-full block">
+          <div class="p-3 text-center">
+            <p class="text-white text-xs font-display tracking-wider cn" data-zh="Tasbih 计数" data-en="Tasbih Count">
+              Tasbih 计数</p>
+          </div>
+        </div>
+        <div class="ss-card fade-in fade-in-delay-4">
+          <img src="./img/setting.png" alt="Settings" class="w-full block">
+          <div class="p-3 text-center">
+            <p class="text-white text-xs font-display tracking-wider cn" data-zh="设置页面" data-en="Settings">设置页面</p>
+          </div>
+        </div>
+        <div class="ss-card fade-in fade-in-delay-5">
+          <img src="./img/taqweem.png" alt="Taqweem" class="w-full block">
+          <div class="p-3 text-center">
+            <p class="text-white text-xs font-display tracking-wider cn" data-zh="祈祷算法" data-en="Algorithm">祈祷算法</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ╔════════════════════════════════════╗ -->
+  <!-- ║  HOW IT WORKS                      ║ -->
+  <!-- ╚════════════════════════════════════╝ -->
+  <section id="howto" class="py-20 px-4 md:px-8" style="background:var(--clr-surface)">
+    <div class="max-w-5xl mx-auto">
+
+      <div class="text-center mb-14 fade-in">
+        <div class="divider-gem"><span><i class="fa fa-list-ol"></i></span></div>
+        <h2 class="font-arabic text-4xl md:text-5xl mb-4 cn" data-zh="使用步骤" data-en="How It Works">使用步骤</h2>
+        <p style="color:var(--clr-muted)" class="max-w-xl mx-auto text-lg cn" data-zh="三步开始，简单高效"
+          data-en="Three steps to get started — simple and efficient.">
+          三步开始，简单高效
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-10 items-start">
+
+        <!-- Steps list -->
+        <div class="space-y-8">
+
+          <div class="flex gap-4 items-start fade-in fade-in-delay-1">
+            <div class="step-num">1</div>
             <div>
-              <p class="text-white/50 text-xs font-display tracking-wider mb-0.5 cn" data-zh="工作时间" data-en="Working Hours">工作时间 / Working Hours</p>
-              <p class="text-white font-display text-sm cn"
-                 data-zh="周一至周日 9:00–21:00（GMT+8）"
-                 data-en="Monday to Sunday 9:00–21:00 (GMT+8)">
-                周一至周日 9:00–21:00（GMT+8）
+              <h3 class="font-display font-semibold text-lg mb-1 cn" data-zh="开机连接" data-en="Power & Connect">开机连接</h3>
+              <p style="color:var(--clr-muted);font-size:14px;line-height:1.8" class="cn"
+                data-zh="短按按键开机，设备显示上次数值并开始搜索蓝牙。指示灯闪烁中；打开 APP 搜索「AL-FATIHA」并配对。"
+                data-en="Short-press to power on. Device shows last count and starts scanning. Open app, find 'AL-FATIHA', and pair.">
+                短按按键开机，设备显示上次数值并开始搜索蓝牙。指示灯闪烁中；打开 APP 搜索「AL-FATIHA」并配对。
               </p>
             </div>
           </div>
 
-          <div class="flex items-start gap-4">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(255,255,255,0.08)">
-              <i class="fa fa-location-dot" style="color:var(--clr-gold)"></i>
+          <div class="flex gap-4 items-start fade-in fade-in-delay-2">
+            <div class="step-num">2</div>
+            <div>
+              <h3 class="font-display font-semibold text-lg mb-1 cn" data-zh="设置国家与城市" data-en="Set Location">设置国家与城市
+              </h3>
+              <p style="color:var(--clr-muted);font-size:14px;line-height:1.8" class="cn"
+                data-zh="APP 默认定位当地位置自动获取祈祷时间；也可手动从 200 国 / 7000 城市中选择，设置完成后进入主菜单。"
+                data-en="App auto-detects your location. Or manually choose from 200 countries / 7,000 cities. Then enter the main menu.">
+                APP 默认定位当地位置自动获取祈祷时间；也可手动从 200 国 / 7000 城市中选择，设置完成后进入主菜单。
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 items-start fade-in fade-in-delay-3">
+            <div class="step-num">3</div>
+            <div>
+              <h3 class="font-display font-semibold text-lg mb-1 cn" data-zh="开始 Tasbih" data-en="Start Tasbih">开始
+                Tasbih</h3>
+              <p style="color:var(--clr-muted);font-size:14px;line-height:1.8" class="cn"
+                data-zh="短按硬件按键计数，每计一次同步到 APP；达到通道倍数（33/66/99/100）自动振动并圈数加 1。长按 3 秒清零。"
+                data-en="Short-press the hardware button to count. Reaches cycle threshold → vibrate + lap+1. Long-press 3s to reset.">
+                短按硬件按键计数，每计一次同步到 APP；达到通道倍数（33/66/99/100）自动振动并圈数加 1。长按 3 秒清零。
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 items-start fade-in fade-in-delay-4">
+            <div class="step-num">4</div>
+            <div>
+              <h3 class="font-display font-semibold text-lg mb-1 cn" data-zh="接收礼拜提醒" data-en="Receive Prayer Alert">
+                接收礼拜提醒</h3>
+              <p style="color:var(--clr-muted);font-size:14px;line-height:1.8" class="cn"
+                data-zh="礼拜时间到，APP 自动推送振动指令，设备振动 5 次。设备 LED 屏显示当前礼拜名称代码（F/D/A/M/I）。"
+                data-en="At prayer time, app sends vibration command — device vibrates 5 times and shows prayer code (F/D/A/M/I) on LED.">
+                礼拜时间到，APP 自动推送振动指令，设备振动 5 次。设备 LED 屏显示当前礼拜名称代码（F/D/A/M/I）。
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Prayer time card -->
+        <div class="prayer-band rounded-2xl p-6 fade-in fade-in-delay-2">
+          <div class="text-xs font-display tracking-widest text-white/50 mb-1 cn" data-zh="SALAT ZIKIR RING"
+            data-en="SALAT ZIKIR RING">SALAT ZIKIR RING</div>
+          <div class="flex items-center gap-3 mb-1">
+            <div class="w-10 h-10 rounded-full border border-white/20 overflow-hidden bg-white/10 flex-shrink-0">
+              <img src="./img/logo.png" class="w-full h-full object-contain">
             </div>
             <div>
-              <p class="text-white/50 text-xs font-display tracking-wider mb-0.5 cn" data-zh="地址" data-en="Address">地址 / Address</p>
-              <p class="text-white font-display text-sm">XXX Technology Park, XXX City, XXX Country</p>
+              <div class="font-display font-bold text-2xl text-white">FAJR</div>
+              <div style="color:var(--clr-gold)" class="font-display font-bold text-xl">6:50 AM</div>
             </div>
+          </div>
+
+          <div
+            class="mt-4 mb-3 px-3 py-2 rounded-lg text-xs font-display tracking-wider text-white/50 border border-white/10 cn"
+            data-zh="下一个祈祷时间" data-en="Next Islamic Prayer Times">下一个祈祷时间</div>
+          <div class="flex items-center justify-between mb-3 px-2">
+            <span class="font-display font-bold text-white text-sm">SHUROQ</span>
+            <span style="color:var(--clr-gold)" class="font-display font-bold text-lg">7:25 AM</span>
+          </div>
+
+          <div id="prayer-list" class="mt-2"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ╔════════════════════════════════════╗ -->
+  <!-- ║  SPECS                             ║ -->
+  <!-- ╚════════════════════════════════════╝ -->
+  <section id="specs" class="py-20 px-4 md:px-8">
+    <div class="max-w-5xl mx-auto">
+
+      <div class="text-center mb-14 fade-in">
+        <div class="divider-gem"><span><i class="fa fa-microchip"></i></span></div>
+        <h2 class="font-arabic text-4xl md:text-5xl mb-4 cn" data-zh="产品规格" data-en="Product Specs">产品规格</h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+
+        <!-- Hardware -->
+        <div class="feat-card fade-in fade-in-delay-1">
+          <h3 class="font-display font-semibold text-base tracking-widest uppercase mb-4 gold cn" data-zh="硬件规格"
+            data-en="Hardware">硬件规格</h3>
+          <div class="spec-row"><span class="spec-label cn" data-zh="显示" data-en="Display">显示</span><span
+              class="spec-val cn" data-zh="LED 三位数码管 + 3 指示灯" data-en="LED 3-digit + 3 indicator lights">LED 三位数码管 + 3
+              指示灯</span></div>
+          <div class="spec-row"><span class="spec-label cn" data-zh="按键" data-en="Button">按键</span><span
+              class="spec-val cn" data-zh="单按键（短按计数 / 长按 3 秒清零）"
+              data-en="Single key (short press count / long press reset)">单按键（短按计数 / 长按 3 秒清零）</span></div>
+          <div class="spec-row"><span class="spec-label cn" data-zh="振动马达" data-en="Motor">振动马达</span><span
+              class="spec-val cn" data-zh="内置振动马达，振动 0.5 秒 / 次" data-en="Built-in, 0.5s per vibration">内置振动马达，振动 0.5 秒 /
+              次</span></div>
+          <div class="spec-row"><span class="spec-label cn" data-zh="电池" data-en="Battery">电池</span><span
+              class="spec-val cn" data-zh="内置锂电池，USB 充电" data-en="Built-in Li-battery, USB charging">内置锂电池，USB 充电</span>
+          </div>
+          <div class="spec-row"><span class="spec-label cn" data-zh="蓝牙名称" data-en="BT Name">蓝牙名称</span><span
+              class="spec-val">AL-FATIHA</span></div>
+          <div class="spec-row"><span class="spec-label cn" data-zh="省电" data-en="Auto-off">省电</span><span
+              class="spec-val cn" data-zh="30 秒无操作熄屏，10 分钟无操作自动关机" data-en="30s no-op dim, 10min auto-off">30 秒无操作熄屏，10
+              分钟关机</span></div>
+        </div>
+
+        <!-- Software -->
+        <div class="feat-card fade-in fade-in-delay-2">
+          <h3 class="font-display font-semibold text-base tracking-widest uppercase mb-4 gold cn" data-zh="软件规格"
+            data-en="Software">软件规格</h3>
+          <div class="spec-row"><span class="spec-label cn" data-zh="平台" data-en="Platform">平台</span><span
+              class="spec-val">iOS & Android</span></div>
+          <div class="spec-row"><span class="spec-label cn" data-zh="语言" data-en="Language">语言</span><span
+              class="spec-val cn" data-zh="英文 / 阿拉伯文 / 中文" data-en="English / Arabic / Chinese">英文 / 阿拉伯文 / 中文</span>
+          </div>
+          <div class="spec-row"><span class="spec-label cn" data-zh="城市数据" data-en="City Data">城市数据</span><span
+              class="spec-val cn" data-zh="200 国家 / 7000 城市" data-en="200 countries / 7,000 cities">200 国家 / 7000
+              城市</span></div>
+          <div class="spec-row"><span class="spec-label cn" data-zh="计算算法" data-en="Algorithm">计算算法</span><span
+              class="spec-val cn" data-zh="6 种算法（含穆斯林世界联盟）" data-en="6 methods incl. Muslim World League">6
+              种（含穆斯林世界联盟）</span></div>
+          <div class="spec-row"><span class="spec-label cn" data-zh="通道" data-en="Channels">通道</span><span
+              class="spec-val">33 · 66 · 99 · 100</span></div>
+          <div class="spec-row"><span class="spec-label cn" data-zh="时间调整" data-en="Time Adjust">时间调整</span><span
+              class="spec-val cn" data-zh="±0–99 分钟，支持 DST 自动/手动" data-en="±0–99 min, Auto/Manual DST">±0–99
+              分钟，Auto/Manual DST</span></div>
+        </div>
+
+      </div>
+
+      <!-- Prayer names -->
+      <div class="mt-10 fade-in">
+        <h3 class="font-display font-semibold text-center mb-6 tracking-widest uppercase text-sm gold cn"
+          data-zh="五次礼拜显示代码" data-en="5 Prayer Display Codes">五次礼拜显示代码</h3>
+        <div class="grid grid-cols-5 gap-3">
+          <div class="text-center py-4 rounded-xl"
+            style="background:var(--clr-surface);border:1px solid rgba(46,125,82,0.2)">
+            <div class="font-display font-bold text-2xl gold">F</div>
+            <div class="text-xs mt-1 font-display" style="color:var(--clr-muted)">FAJR</div>
+          </div>
+          <div class="text-center py-4 rounded-xl"
+            style="background:var(--clr-surface);border:1px solid rgba(46,125,82,0.2)">
+            <div class="font-display font-bold text-2xl gold">D</div>
+            <div class="text-xs mt-1 font-display" style="color:var(--clr-muted)">DHUHR</div>
+          </div>
+          <div class="text-center py-4 rounded-xl"
+            style="background:var(--clr-surface);border:1px solid rgba(46,125,82,0.2)">
+            <div class="font-display font-bold text-2xl gold">A</div>
+            <div class="text-xs mt-1 font-display" style="color:var(--clr-muted)">ASR</div>
+          </div>
+          <div class="text-center py-4 rounded-xl"
+            style="background:var(--clr-surface);border:1px solid rgba(46,125,82,0.2)">
+            <div class="font-display font-bold text-2xl gold">M</div>
+            <div class="text-xs mt-1 font-display" style="color:var(--clr-muted)">MAGHRIB</div>
+          </div>
+          <div class="text-center py-4 rounded-xl"
+            style="background:var(--clr-surface);border:1px solid rgba(46,125,82,0.2)">
+            <div class="font-display font-bold text-2xl gold">I</div>
+            <div class="text-xs mt-1 font-display" style="color:var(--clr-muted)">ISHA</div>
           </div>
         </div>
       </div>
+    </div>
+  </section>
 
-      <!-- Contact Form -->
-      <div class="rounded-2xl p-6 md:p-8 fade-in fade-in-delay-2" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1)">
-        <h3 class="font-display font-semibold tracking-widest text-sm uppercase mb-6" style="color:var(--clr-gold)">
-          <span class="cn" data-zh="在线留言" data-en="Leave a Message">在线留言 / Leave a Message</span>
-        </h3>
 
-        <div id="form-success" class="hidden text-center py-8">
-          <i class="fa fa-circle-check text-4xl mb-3" style="color:var(--clr-gold)"></i>
-          <p class="text-white font-display font-semibold cn"
-             data-zh="留言成功，我们将在24小时内与您联系"
-             data-en="Message submitted successfully, we will contact you within 24 hours">
-             留言成功，我们将在24小时内与您联系
-          </p>
-          <p class="text-white/50 text-sm mt-1">Message submitted successfully, we will contact you within 24 hours</p>
+  <!-- ╔════════════════════════════════════╗ -->
+  <!-- ║  FAQ                               ║ -->
+  <!-- ╚════════════════════════════════════╝ -->
+  <section id="faq" class="py-20 px-4 md:px-8" style="background:var(--clr-surface)">
+    <div class="max-w-3xl mx-auto">
+
+      <div class="text-center mb-14 fade-in">
+        <div class="divider-gem"><span><i class="fa fa-circle-question"></i></span></div>
+        <h2 class="font-arabic text-4xl md:text-5xl mb-4 cn" data-zh="常见问题" data-en="FAQs">常见问题</h2>
+        <p style="color:var(--clr-muted)" class="max-w-xl mx-auto text-lg cn" data-zh="点击问题查看详细解答"
+          data-en="Click a question to expand the answer">
+          点击问题查看详细解答
+        </p>
+      </div>
+
+      <div class="space-y-3" id="faq-list">
+
+        <!-- FAQ Item 1 -->
+        <div class="faq-item feat-card cursor-pointer fade-in fade-in-delay-1" onclick="toggleFaq(this)">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="font-display font-semibold text-base cn" data-zh="硬件无法与 APP 配对怎么办？"
+                data-en="What if the hardware cannot pair with the APP?">
+                硬件无法与 APP 配对怎么办？
+              </p>
+              <p class="text-xs mt-0.5 font-display" style="color:var(--clr-muted)">
+                Q: What if the hardware cannot pair with the APP?
+              </p>
+            </div>
+            <i class="fa fa-chevron-down faq-icon gold flex-shrink-0 transition-transform duration-300"
+              style="font-size:14px"></i>
+          </div>
+          <div class="faq-answer hidden mt-4 pt-4" style="border-top:1px solid rgba(46,125,82,0.15)">
+            <div class="text-sm leading-relaxed space-y-2" style="color:var(--clr-muted)">
+              <p class="cn font-semibold mb-2" style="color:var(--clr-text)" data-zh="中文解答：" data-en="Answer:">中文解答：</p>
+              <p class="cn"
+                data-zh="① 确认硬件已开机且指示灯闪烁（蓝牙搜索中）；<br>② 确认手机蓝牙已开启并授予 APP 蓝牙权限；<br>③ 确认手机与硬件距离在 10 米内，无其他蓝牙设备干扰；<br>④ 重启硬件与 APP 后重新搜索配对。"
+                data-en="① Confirm the hardware is powered on and the indicator light is flashing (Bluetooth searching);<br>② Confirm the phone's Bluetooth is on and the APP is granted Bluetooth permission;<br>③ Confirm the distance between the phone and the hardware is within 10 meters without interference from other Bluetooth devices;<br>④ Restart the hardware and APP and search for pairing again.">
+                ① 确认硬件已开机且指示灯闪烁（蓝牙搜索中）；<br>② 确认手机蓝牙已开启并授予 APP 蓝牙权限；<br>③ 确认手机与硬件距离在 10 米内，无其他蓝牙设备干扰；<br>④ 重启硬件与 APP
+                后重新搜索配对。
+              </p>
+              <p class="mt-3 pt-3 font-semibold text-xs font-display tracking-wider"
+                style="border-top:1px dashed rgba(46,125,82,0.2);color:var(--clr-text)">EN:</p>
+              <p style="font-size:13px">① Confirm the hardware is powered on and the indicator light is flashing; ②
+                Confirm Bluetooth is on and the APP has Bluetooth permission; ③ Ensure distance is within 10 meters, no
+                interference; ④ Restart hardware and APP then search again.</p>
+            </div>
+          </div>
         </div>
 
-        <div id="contact-form" class="space-y-4">
-          <div class="grid grid-cols-2 gap-4">
+        <!-- FAQ Item 2 -->
+        <div class="faq-item feat-card cursor-pointer fade-in fade-in-delay-2" onclick="toggleFaq(this)">
+          <div class="flex items-center justify-between gap-4">
             <div>
-              <label class="block text-white/50 text-xs font-display tracking-wider mb-1.5 cn" data-zh="姓名 *" data-en="Name *">姓名 / Name *</label>
-              <input type="text" id="f-name" placeholder="Your Name"
+              <p class="font-display font-semibold text-base cn" data-zh="祈祷时间为何不自动切换？"
+                data-en="Why doesn't the prayer time switch automatically?">
+                祈祷时间为何不自动切换？
+              </p>
+              <p class="text-xs mt-0.5 font-display" style="color:var(--clr-muted)">
+                Q: Why doesn't the prayer time switch automatically?
+              </p>
+            </div>
+            <i class="fa fa-chevron-down faq-icon gold flex-shrink-0 transition-transform duration-300"
+              style="font-size:14px"></i>
+          </div>
+          <div class="faq-answer hidden mt-4 pt-4" style="border-top:1px solid rgba(46,125,82,0.15)">
+            <div class="text-sm leading-relaxed space-y-2" style="color:var(--clr-muted)">
+              <p class="cn font-semibold mb-2" style="color:var(--clr-text)" data-zh="中文解答：" data-en="Answer:">中文解答：</p>
+              <p class="cn"
+                data-zh="① 确认 APP 已定位到正确的本地位置或手动选择了正确的国家/城市；<br>② 确认 DST 设置与当地夏令时规则一致；<br>③ 检查祈祷时间误差调整是否设置合理，重启 APP 后重新加载数据。"
+                data-en="① Confirm the APP has located the correct local location or manually selected the correct country/city;<br>② Confirm the DST setting is consistent with the local daylight saving time rules;<br>③ Check if the prayer time error adjustment is set reasonably, and reload the data after restarting the APP.">
+                ① 确认 APP 已定位到正确的本地位置或手动选择了正确的国家/城市；<br>② 确认 DST 设置与当地夏令时规则一致；<br>③ 检查祈祷时间误差调整是否设置合理，重启 APP 后重新加载数据。
+              </p>
+              <p class="mt-3 pt-3 font-semibold text-xs font-display tracking-wider"
+                style="border-top:1px dashed rgba(46,125,82,0.2);color:var(--clr-text)">EN:</p>
+              <p style="font-size:13px">① Confirm the APP has the correct location set; ② Confirm DST settings match
+                local rules; ③ Check prayer time offset adjustment, then restart APP to reload data.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ Item 3 -->
+        <div class="faq-item feat-card cursor-pointer fade-in fade-in-delay-3" onclick="toggleFaq(this)">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="font-display font-semibold text-base cn" data-zh="计数达到通道倍数后无振动提醒？"
+                data-en="No vibration when count reaches the channel multiple?">
+                计数达到通道倍数后无振动提醒？
+              </p>
+              <p class="text-xs mt-0.5 font-display" style="color:var(--clr-muted)">
+                Q: No vibration reminder when the count reaches the channel multiple?
+              </p>
+            </div>
+            <i class="fa fa-chevron-down faq-icon gold flex-shrink-0 transition-transform duration-300"
+              style="font-size:14px"></i>
+          </div>
+          <div class="faq-answer hidden mt-4 pt-4" style="border-top:1px solid rgba(46,125,82,0.15)">
+            <div class="text-sm leading-relaxed space-y-2" style="color:var(--clr-muted)">
+              <p class="cn font-semibold mb-2" style="color:var(--clr-text)" data-zh="中文解答：" data-en="Answer:">中文解答：</p>
+              <p class="cn" data-zh="① 确认硬件与 APP 已成功蓝牙连接；<br>② 检查 APP 中通道设置是否选择正确；<br>③ 确认硬件电量充足，低电状态下部分功能会受限，充电后重试。"
+                data-en="① Confirm the hardware and APP have successfully connected via Bluetooth;<br>② Check if the channel setting in the APP is selected correctly;<br>③ Confirm the hardware has sufficient battery power, some functions are limited in low battery state, try again after charging.">
+                ① 确认硬件与 APP 已成功蓝牙连接；<br>② 检查 APP 中通道设置是否选择正确；<br>③ 确认硬件电量充足，低电状态下部分功能会受限，充电后重试。
+              </p>
+              <p class="mt-3 pt-3 font-semibold text-xs font-display tracking-wider"
+                style="border-top:1px dashed rgba(46,125,82,0.2);color:var(--clr-text)">EN:</p>
+              <p style="font-size:13px">① Confirm Bluetooth connection is active; ② Check channel setting in APP; ③
+                Ensure battery is sufficient — some functions are limited when low, try after charging.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ Item 4 -->
+        <div class="faq-item feat-card cursor-pointer fade-in fade-in-delay-1" onclick="toggleFaq(this)">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="font-display font-semibold text-base cn" data-zh="APP 支持哪些手机系统版本？"
+                data-en="Which mobile system versions does the APP support?">
+                APP 支持哪些手机系统版本？
+              </p>
+              <p class="text-xs mt-0.5 font-display" style="color:var(--clr-muted)">
+                Q: Which mobile system versions does the APP support?
+              </p>
+            </div>
+            <i class="fa fa-chevron-down faq-icon gold flex-shrink-0 transition-transform duration-300"
+              style="font-size:14px"></i>
+          </div>
+          <div class="faq-answer hidden mt-4 pt-4" style="border-top:1px solid rgba(46,125,82,0.15)">
+            <div class="text-sm leading-relaxed space-y-2" style="color:var(--clr-muted)">
+              <p class="cn font-semibold mb-2" style="color:var(--clr-text)" data-zh="中文解答：" data-en="Answer:">中文解答：</p>
+              <p class="cn" data-zh="苹果 iOS 需 11.0 及以上版本，安卓 Android 需 8.0 及以上版本，确保手机系统版本达标以保证 APP 正常运行。"
+                data-en="Apple iOS requires version 11.0 and above, Android requires version 8.0 and above, ensure the mobile system version meets the standard to ensure the normal operation of the APP.">
+                苹果 iOS 需 11.0 及以上版本，安卓 Android 需 8.0 及以上版本，确保手机系统版本达标以保证 APP 正常运行。
+              </p>
+              <p class="mt-3 pt-3 font-semibold text-xs font-display tracking-wider"
+                style="border-top:1px dashed rgba(46,125,82,0.2);color:var(--clr-text)">EN:</p>
+              <p style="font-size:13px">Apple iOS 11.0+, Android 8.0+. Ensure your system meets the requirement for the
+                APP to function correctly.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ Item 5 -->
+        <div class="faq-item feat-card cursor-pointer fade-in fade-in-delay-2" onclick="toggleFaq(this)">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="font-display font-semibold text-base cn" data-zh="当日总计数如何清零？"
+                data-en="How to reset the daily total count?">
+                当日总计数如何清零？
+              </p>
+              <p class="text-xs mt-0.5 font-display" style="color:var(--clr-muted)">
+                Q: How to reset the daily total count?
+              </p>
+            </div>
+            <i class="fa fa-chevron-down faq-icon gold flex-shrink-0 transition-transform duration-300"
+              style="font-size:14px"></i>
+          </div>
+          <div class="faq-answer hidden mt-4 pt-4" style="border-top:1px solid rgba(46,125,82,0.15)">
+            <div class="text-sm leading-relaxed space-y-2" style="color:var(--clr-muted)">
+              <p class="cn font-semibold mb-2" style="color:var(--clr-text)" data-zh="中文解答：" data-en="Answer:">中文解答：</p>
+              <p class="cn" data-zh="在 APP 计数主页面点击「清除」按钮，可一键清零当日总计数；当日总计数会在每日 00:00 自动清零，无需手动操作。" data-en="Click the "
+                Clear" button on the APP counting main page to reset the daily total count with one click; the daily
+                total count will be automatically reset at 00:00 every day without manual operation.">
+                在 APP 计数主页面点击「清除」按钮，可一键清零当日总计数；当日总计数会在每日 00:00 自动清零，无需手动操作。
+              </p>
+              <p class="mt-3 pt-3 font-semibold text-xs font-display tracking-wider"
+                style="border-top:1px dashed rgba(46,125,82,0.2);color:var(--clr-text)">EN:</p>
+              <p style="font-size:13px">Tap the "Clear" button on the counting page to reset instantly. The daily total
+                also resets automatically at 00:00 every day — no manual action needed.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ╔════════════════════════════════════╗ -->
+  <!-- ║  CONTACT US                        ║ -->
+  <!-- ╚════════════════════════════════════╝ -->
+  <section id="contact" class="py-20 px-4 md:px-8 islamic-bg" style="background:var(--clr-green);position:relative;">
+    <div class="max-w-6xl mx-auto relative z-10">
+
+      <div class="text-center mb-14 fade-in">
+        <div class="divider-gem"><span><i class="fa fa-envelope" style="color:var(--clr-gold)"></i></span></div>
+        <h2 class="font-arabic text-4xl md:text-5xl mb-4 text-white cn" data-zh="联系我们" data-en="Contact Us">联系我们</h2>
+        <p class="text-white/60 max-w-xl mx-auto text-lg cn" data-zh="我们随时准备为您提供支持，请通过以下方式联系我们。"
+          data-en="We are always ready to support you. Please reach us through the channels below.">
+          我们随时准备为您提供支持，请通过以下方式联系我们。
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-10 items-start">
+
+        <!-- Contact Info -->
+        <div class="fade-in fade-in-delay-1">
+          <h3 class="font-display font-semibold tracking-widest text-sm uppercase mb-6" style="color:var(--clr-gold)"
+            class="cn" data-zh="联系信息 / Contact Information">联系信息 / Contact Information</h3>
+
+          <div class="space-y-5">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style="background:rgba(255,255,255,0.08)">
+                <i class="fa fa-envelope" style="color:var(--clr-gold)"></i>
+              </div>
+              <div>
+                <p class="text-white/50 text-xs font-display tracking-wider mb-0.5 cn" data-zh="客服邮箱"
+                  data-en="Customer Service Email">客服邮箱 / Customer Service Email</p>
+                <a href="mailto:support@alfatiha-tasbih.com" class="text-white font-display text-sm hover:underline"
+                  style="color:var(--clr-gold)">support@alfatiha-tasbih.com</a>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style="background:rgba(255,255,255,0.08)">
+                <i class="fa fa-phone" style="color:var(--clr-gold)"></i>
+              </div>
+              <div>
+                <p class="text-white/50 text-xs font-display tracking-wider mb-0.5 cn" data-zh="客服电话"
+                  data-en="Customer Service Phone">客服电话 / Customer Service Phone</p>
+                <p class="text-white font-display text-sm">+1 (888) 123-4567</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style="background:rgba(255,255,255,0.08)">
+                <i class="fa fa-clock" style="color:var(--clr-gold)"></i>
+              </div>
+              <div>
+                <p class="text-white/50 text-xs font-display tracking-wider mb-0.5 cn" data-zh="工作时间"
+                  data-en="Working Hours">工作时间 / Working Hours</p>
+                <p class="text-white font-display text-sm cn" data-zh="周一至周日 9:00–21:00（GMT+8）"
+                  data-en="Monday to Sunday 9:00–21:00 (GMT+8)">
+                  周一至周日 9:00–21:00（GMT+8）
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style="background:rgba(255,255,255,0.08)">
+                <i class="fa fa-location-dot" style="color:var(--clr-gold)"></i>
+              </div>
+              <div>
+                <p class="text-white/50 text-xs font-display tracking-wider mb-0.5 cn" data-zh="地址" data-en="Address">地址
+                  / Address</p>
+                <p class="text-white font-display text-sm">Silicon Valley Technology Park, 100 Innovation Drive, USA</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="rounded-2xl p-6 md:p-8 fade-in fade-in-delay-2"
+          style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1)">
+          <h3 class="font-display font-semibold tracking-widest text-sm uppercase mb-6" style="color:var(--clr-gold)">
+            <span class="cn" data-zh="在线留言" data-en="Leave a Message">在线留言 / Leave a Message</span>
+          </h3>
+
+          <div id="form-success" class="hidden text-center py-8">
+            <i class="fa fa-circle-check text-4xl mb-3" style="color:var(--clr-gold)"></i>
+            <p class="text-white font-display font-semibold cn" data-zh="留言成功，我们将在24小时内与您联系"
+              data-en="Message submitted successfully, we will contact you within 24 hours">
+              留言成功，我们将在24小时内与您联系
+            </p>
+            <p class="text-white/50 text-sm mt-1">Message submitted successfully, we will contact you within 24 hours
+            </p>
+          </div>
+
+          <div id="contact-form" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-white/50 text-xs font-display tracking-wider mb-1.5 cn" data-zh="姓名 *"
+                  data-en="Name *">姓名 / Name *</label>
+                <input type="text" id="f-name" placeholder="Your Name"
+                  class="w-full px-3 py-2.5 rounded-lg text-sm font-display outline-none transition"
+                  style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;caret-color:#e8a030"
+                  onfocus="this.style.borderColor='var(--clr-gold)'"
+                  onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
+              </div>
+              <div>
+                <label class="block text-white/50 text-xs font-display tracking-wider mb-1.5 cn" data-zh="邮箱 *"
+                  data-en="Email *">邮箱 / Email *</label>
+                <input type="email" id="f-email" placeholder="your@email.com"
+                  class="w-full px-3 py-2.5 rounded-lg text-sm font-display outline-none transition"
+                  style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;caret-color:#e8a030"
+                  onfocus="this.style.borderColor='var(--clr-gold)'"
+                  onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-white/50 text-xs font-display tracking-wider mb-1.5 cn" data-zh="电话"
+                data-en="Phone">电话 / Phone</label>
+              <input type="tel" id="f-phone" placeholder="+XX XXXXX XXXXX"
                 class="w-full px-3 py-2.5 rounded-lg text-sm font-display outline-none transition"
                 style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;caret-color:#e8a030"
-                onfocus="this.style.borderColor='var(--clr-gold)'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
+                onfocus="this.style.borderColor='var(--clr-gold)'"
+                onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
             </div>
+
             <div>
-              <label class="block text-white/50 text-xs font-display tracking-wider mb-1.5 cn" data-zh="邮箱 *" data-en="Email *">邮箱 / Email *</label>
-              <input type="email" id="f-email" placeholder="your@email.com"
-                class="w-full px-3 py-2.5 rounded-lg text-sm font-display outline-none transition"
-                style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;caret-color:#e8a030"
-                onfocus="this.style.borderColor='var(--clr-gold)'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
+              <label class="block text-white/50 text-xs font-display tracking-wider mb-1.5 cn" data-zh="留言类型 *"
+                data-en="Message Type *">留言类型 / Message Type *</label>
+              <select id="f-type"
+                class="w-full px-3 py-2.5 rounded-lg text-sm font-display outline-none transition appearance-none"
+                style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff"
+                onfocus="this.style.borderColor='var(--clr-gold)'"
+                onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
+                <option value="" style="background:#1a4d2e" class="cn" data-zh="请选择 / Please select"
+                  data-en="Please select">请选择 / Please select</option>
+                <option value="product" style="background:#1a4d2e" class="cn" data-zh="产品咨询 / Product Enquiry"
+                  data-en="Product Enquiry">产品咨询 / Product Enquiry</option>
+                <option value="aftersales" style="background:#1a4d2e" class="cn" data-zh="售后问题 / After-Sales"
+                  data-en="After-Sales">售后问题 / After-Sales</option>
+                <option value="feedback" style="background:#1a4d2e" class="cn" data-zh="建议反馈 / Feedback"
+                  data-en="Feedback">建议反馈 / Feedback</option>
+              </select>
             </div>
-          </div>
 
-          <div>
-            <label class="block text-white/50 text-xs font-display tracking-wider mb-1.5 cn" data-zh="电话" data-en="Phone">电话 / Phone</label>
-            <input type="tel" id="f-phone" placeholder="+XX XXXXX XXXXX"
-              class="w-full px-3 py-2.5 rounded-lg text-sm font-display outline-none transition"
-              style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;caret-color:#e8a030"
-              onfocus="this.style.borderColor='var(--clr-gold)'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
-          </div>
+            <div>
+              <label class="block text-white/50 text-xs font-display tracking-wider mb-1.5 cn" data-zh="留言内容 *"
+                data-en="Message *">留言内容 / Message *</label>
+              <textarea id="f-msg" rows="4" placeholder="Please enter your message..."
+                class="w-full px-3 py-2.5 rounded-lg text-sm font-display outline-none transition resize-none"
+                style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;caret-color:#e8a030"
+                onfocus="this.style.borderColor='var(--clr-gold)'"
+                onblur="this.style.borderColor='rgba(255,255,255,0.15)'"></textarea>
+            </div>
 
-          <div>
-            <label class="block text-white/50 text-xs font-display tracking-wider mb-1.5 cn" data-zh="留言类型 *" data-en="Message Type *">留言类型 / Message Type *</label>
-            <select id="f-type"
-              class="w-full px-3 py-2.5 rounded-lg text-sm font-display outline-none transition appearance-none"
-              style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff"
-              onfocus="this.style.borderColor='var(--clr-gold)'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
-              <option value="" style="background:#1a4d2e" class="cn" data-zh="请选择 / Please select" data-en="Please select">请选择 / Please select</option>
-              <option value="product" style="background:#1a4d2e" class="cn" data-zh="产品咨询 / Product Enquiry" data-en="Product Enquiry">产品咨询 / Product Enquiry</option>
-              <option value="aftersales" style="background:#1a4d2e" class="cn" data-zh="售后问题 / After-Sales" data-en="After-Sales">售后问题 / After-Sales</option>
-              <option value="feedback" style="background:#1a4d2e" class="cn" data-zh="建议反馈 / Feedback" data-en="Feedback">建议反馈 / Feedback</option>
-            </select>
-          </div>
+            <!-- Verification -->
+            <div class="flex items-center gap-3">
+              <div id="captcha-box"
+                class="flex items-center justify-center px-4 py-2.5 rounded-lg font-display font-bold text-lg tracking-widest select-none cursor-default"
+                style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:var(--clr-gold);min-width:96px;letter-spacing:6px">
+              </div>
+              <button onclick="refreshCaptcha()"
+                class="w-9 h-9 rounded-lg flex items-center justify-center transition hover:scale-110"
+                style="background:rgba(255,255,255,0.08);color:var(--clr-gold);border:none;cursor:pointer">
+                <i class="fa fa-rotate-right text-sm"></i>
+              </button>
+              <input type="text" id="f-captcha" placeholder="验证码" maxlength="4"
+                class="flex-1 px-3 py-2.5 rounded-lg text-sm font-display outline-none transition"
+                style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;caret-color:#e8a030"
+                onfocus="this.style.borderColor='var(--clr-gold)'"
+                onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
+            </div>
+            <p id="captcha-err" class="hidden text-xs" style="color:#f87171;font-family:'Josefin Sans',sans-serif"></p>
 
-          <div>
-            <label class="block text-white/50 text-xs font-display tracking-wider mb-1.5 cn" data-zh="留言内容 *" data-en="Message *">留言内容 / Message *</label>
-            <textarea id="f-msg" rows="4" placeholder="Please enter your message..."
-              class="w-full px-3 py-2.5 rounded-lg text-sm font-display outline-none transition resize-none"
-              style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;caret-color:#e8a030"
-              onfocus="this.style.borderColor='var(--clr-gold)'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'"></textarea>
-          </div>
-
-          <!-- Verification -->
-          <div class="flex items-center gap-3">
-            <div id="captcha-box" class="flex items-center justify-center px-4 py-2.5 rounded-lg font-display font-bold text-lg tracking-widest select-none cursor-default"
-                 style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:var(--clr-gold);min-width:96px;letter-spacing:6px"></div>
-            <button onclick="refreshCaptcha()" class="w-9 h-9 rounded-lg flex items-center justify-center transition hover:scale-110" style="background:rgba(255,255,255,0.08);color:var(--clr-gold);border:none;cursor:pointer">
-              <i class="fa fa-rotate-right text-sm"></i>
+            <button onclick="submitForm()"
+              class="w-full py-3 rounded-xl font-display font-semibold text-sm tracking-widest uppercase transition hover:scale-[1.02] active:scale-[0.98]"
+              style="background:var(--clr-gold);color:#0d2e1a;border:none;cursor:pointer;letter-spacing:0.1em">
+              <span class="cn" data-zh="提交留言" data-en="Submit">提交留言 / Submit</span>
             </button>
-            <input type="text" id="f-captcha" placeholder="验证码" maxlength="4"
-              class="flex-1 px-3 py-2.5 rounded-lg text-sm font-display outline-none transition"
-              style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;caret-color:#e8a030"
-              onfocus="this.style.borderColor='var(--clr-gold)'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
           </div>
-          <p id="captcha-err" class="hidden text-xs" style="color:#f87171;font-family:'Josefin Sans',sans-serif"></p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-          <button onclick="submitForm()"
-            class="w-full py-3 rounded-xl font-display font-semibold text-sm tracking-widest uppercase transition hover:scale-[1.02] active:scale-[0.98]"
-            style="background:var(--clr-gold);color:#0d2e1a;border:none;cursor:pointer;letter-spacing:0.1em">
-            <span class="cn" data-zh="提交留言" data-en="Submit">提交留言 / Submit</span>
+
+  <!-- ╔════════════════════════════════════╗ -->
+  <!-- ║  PURCHASE                          ║ -->
+  <!-- ╚════════════════════════════════════╝ -->
+  <section id="purchase" class="py-20 px-4 md:px-8">
+    <div class="max-w-5xl mx-auto">
+
+      <div class="text-center mb-14 fade-in">
+        <div class="divider-gem"><span><i class="fa fa-cart-shopping"></i></span></div>
+        <h2 class="font-arabic text-4xl md:text-5xl mb-4 cn" data-zh="立即购买" data-en="Where to Buy">立即购买</h2>
+        <p style="color:var(--clr-muted)" class="max-w-xl mx-auto text-lg cn" data-zh="多平台全球发售，选择最适合您的购买渠道"
+          data-en="Available globally on multiple platforms — choose the channel that suits you best.">
+          多平台全球发售，选择最适合您的购买渠道
+        </p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+        <!-- Amazon -->
+        <a href="#"
+          class="feat-card flex flex-col items-center text-center gap-4 group no-underline fade-in fade-in-delay-1">
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition group-hover:scale-110"
+            style="background:linear-gradient(135deg,#ff9900,#e88a00)">
+            <i class="fab fa-amazon text-white text-2xl"></i>
+          </div>
+          <div>
+            <p class="font-display font-semibold text-base mb-1">Amazon</p>
+            <p class="text-xs cn" style="color:var(--clr-muted)" data-zh="全球最大电商平台"
+              data-en="World's largest marketplace">全球最大电商平台</p>
+          </div>
+          <div
+            class="mt-auto px-4 py-1.5 rounded-full text-xs font-display font-semibold transition group-hover:scale-105"
+            style="background:linear-gradient(135deg,#ff9900,#e88a00);color:#fff">
+            <span class="cn" data-zh="前往购买" data-en="Shop Now">前往购买</span> →
+          </div>
+        </a>
+
+        <!-- AliExpress -->
+        <a href="#"
+          class="feat-card flex flex-col items-center text-center gap-4 group no-underline fade-in fade-in-delay-2">
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition group-hover:scale-110"
+            style="background:linear-gradient(135deg,#e84b37,#c43020)">
+            <i class="fa fa-store text-white text-2xl"></i>
+          </div>
+          <div>
+            <p class="font-display font-semibold text-base mb-1">AliExpress</p>
+            <p class="text-xs cn" style="color:var(--clr-muted)" data-zh="速卖通·全球包邮" data-en="Global shipping worldwide">
+              速卖通·全球包邮</p>
+          </div>
+          <div
+            class="mt-auto px-4 py-1.5 rounded-full text-xs font-display font-semibold transition group-hover:scale-105"
+            style="background:linear-gradient(135deg,#e84b37,#c43020);color:#fff">
+            <span class="cn" data-zh="前往购买" data-en="Shop Now">前往购买</span> →
+          </div>
+        </a>
+
+        <!-- Official Mall -->
+        <a href="#"
+          class="feat-card flex flex-col items-center text-center gap-4 group no-underline fade-in fade-in-delay-3">
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition group-hover:scale-110"
+            style="background:linear-gradient(135deg,#1a4d2e,#2e7d52)">
+            <img src="./img/logo.png" alt="Official" class="w-10 h-10 object-contain rounded-full">
+          </div>
+          <div>
+            <p class="font-display font-semibold text-base mb-1 cn" data-zh="官方商城" data-en="Official Mall">官方商城</p>
+            <p class="text-xs cn" style="color:var(--clr-muted)" data-zh="官方直营·正品保障"
+              data-en="Direct official store, guaranteed authentic">官方直营·正品保障</p>
+          </div>
+          <div
+            class="mt-auto px-4 py-1.5 rounded-full text-xs font-display font-semibold transition group-hover:scale-105"
+            style="background:linear-gradient(135deg,#1a4d2e,#2e7d52);color:#e8a030">
+            <span class="cn" data-zh="前往购买" data-en="Shop Now">前往购买</span> →
+          </div>
+        </a>
+
+        <!-- Offline Dealers -->
+        <a href="#dealer-modal" onclick="showDealers(event)"
+          class="feat-card flex flex-col items-center text-center gap-4 group no-underline fade-in fade-in-delay-4">
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition group-hover:scale-110"
+            style="background:linear-gradient(135deg,#6b5c3a,#8c7a50)">
+            <i class="fa fa-map-location-dot text-white text-2xl"></i>
+          </div>
+          <div>
+            <p class="font-display font-semibold text-base mb-1 cn" data-zh="线下经销商" data-en="Offline Dealers">线下经销商</p>
+            <p class="text-xs cn" style="color:var(--clr-muted)" data-zh="查找附近授权门店"
+              data-en="Find authorized stores near you">查找附近授权门店</p>
+          </div>
+          <div
+            class="mt-auto px-4 py-1.5 rounded-full text-xs font-display font-semibold transition group-hover:scale-105"
+            style="background:linear-gradient(135deg,#6b5c3a,#8c7a50);color:#fff">
+            <span class="cn" data-zh="查看地址" data-en="View Locations">查看地址</span> →
+          </div>
+        </a>
+
+      </div>
+
+      <!-- Dealer Modal (inline, no fixed position) -->
+      <div id="dealer-modal" class="hidden mt-10 rounded-2xl p-6 md:p-8 fade-in"
+        style="background:var(--clr-surface);border:1px solid rgba(46,125,82,0.25)">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="font-display font-semibold text-lg cn" data-zh="授权经销商列表" data-en="Authorized Dealer Locations">
+            授权经销商列表 / Authorized Dealer Locations</h3>
+          <button onclick="closeDealers()"
+            class="w-8 h-8 rounded-full flex items-center justify-center transition hover:scale-110"
+            style="background:rgba(46,125,82,0.1);border:none;cursor:pointer;color:var(--clr-muted)">
+            <i class="fa fa-xmark"></i>
           </button>
         </div>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl" style="background:rgba(46,125,82,0.06);border:1px solid rgba(46,125,82,0.15)">
+            <p class="font-display font-semibold text-sm mb-1 gold">Dubai, UAE</p>
+            <p class="text-xs" style="color:var(--clr-muted)">AL-FATIHA Islamic Goods · Mall of Emirates, Level 2</p>
+          </div>
+          <div class="p-4 rounded-xl" style="background:rgba(46,125,82,0.06);border:1px solid rgba(46,125,82,0.15)">
+            <p class="font-display font-semibold text-sm mb-1 gold">Kuala Lumpur, Malaysia</p>
+            <p class="text-xs" style="color:var(--clr-muted)">Suria KLCC · Ground Floor, Unit G-12</p>
+          </div>
+          <div class="p-4 rounded-xl" style="background:rgba(46,125,82,0.06);border:1px solid rgba(46,125,82,0.15)">
+            <p class="font-display font-semibold text-sm mb-1 gold">Istanbul, Turkey</p>
+            <p class="text-xs" style="color:var(--clr-muted)">Grand Bazaar · Row 7, Shop 234</p>
+          </div>
+          <div class="p-4 rounded-xl" style="background:rgba(46,125,82,0.06);border:1px solid rgba(46,125,82,0.15)">
+            <p class="font-display font-semibold text-sm mb-1 gold">Jakarta, Indonesia</p>
+            <p class="text-xs" style="color:var(--clr-muted)">Plaza Indonesia · Islamic Lifestyle Zone, B2</p>
+          </div>
+        </div>
+        <p class="text-xs mt-4 cn" style="color:var(--clr-muted)" data-zh="如需成为授权经销商，请发邮件至 support@alfatiha-tasbih.com"
+          data-en="To become an authorized dealer, email support@alfatiha-tasbih.com">
+          如需成为授权经销商，请发邮件至 support@alfatiha-tasbih.com
+        </p>
       </div>
+
     </div>
-  </div>
-</section>
+  </section>
 
 
-<!-- ╔════════════════════════════════════╗ -->
-<!-- ║  PURCHASE                          ║ -->
-<!-- ╚════════════════════════════════════╝ -->
-<section id="purchase" class="py-20 px-4 md:px-8">
-  <div class="max-w-5xl mx-auto">
+  <!-- ╔════════════════════════════════════╗ -->
+  <!-- ║  DOWNLOAD                          ║ -->
+  <!-- ╚════════════════════════════════════╝ -->
+  <section id="download" class="py-24 px-4 md:px-8 hero-bg islamic-bg relative overflow-hidden">
+    <div class="hero-orb absolute top-0 right-0 w-96 h-96 opacity-30"></div>
+    <div class="max-w-3xl mx-auto text-center text-white relative z-10">
 
-    <div class="text-center mb-14 fade-in">
-      <div class="divider-gem"><span><i class="fa fa-cart-shopping"></i></span></div>
-      <h2 class="font-arabic text-4xl md:text-5xl mb-4 cn" data-zh="立即购买" data-en="Where to Buy">立即购买</h2>
-      <p style="color:var(--clr-muted)" class="max-w-xl mx-auto text-lg cn"
-         data-zh="多平台全球发售，选择最适合您的购买渠道"
-         data-en="Available globally on multiple platforms — choose the channel that suits you best.">
-        多平台全球发售，选择最适合您的购买渠道
+      <div class="flex justify-center mb-8">
+        <div class="w-24 h-24 rounded-full border-2 overflow-hidden" style="border-color:var(--clr-gold)">
+          <img src="./img/logo.png" alt="AL-FATIHA" class="w-full h-full object-contain">
+        </div>
+      </div>
+
+      <div class="font-arabic text-xl mb-2 text-gold-400">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+      <h2 class="font-arabic text-4xl md:text-5xl mb-4 cn" data-zh="立即下载 APP" data-en="Download the App Now">立即下载 APP
+      </h2>
+      <p class="text-white/60 mb-10 max-w-lg mx-auto text-lg cn" data-zh="免费下载，连接 S01 蓝牙计数器，开启您的智能礼拜旅程。"
+        data-en="Free download. Connect your S01 Bluetooth Tasbih and begin your smart worship journey.">
+        免费下载，连接 S01 蓝牙计数器，开启您的智能礼拜旅程。
       </p>
+
+      <div class="flex flex-wrap justify-center gap-4 mb-8">
+        <a href="#" class="dl-btn dl-ios">
+          <i class="fab fa-apple text-2xl"></i>
+          <div class="text-left">
+            <div class="text-xs opacity-70 cn" data-zh="在 App Store 下载" data-en="Download on the">在 App Store 下载</div>
+            <div class="text-base font-bold">App Store</div>
+          </div>
+        </a>
+        <a href="#" class="dl-btn dl-android">
+          <i class="fab fa-google-play text-2xl"></i>
+          <div class="text-left">
+            <div class="text-xs opacity-70 cn" data-zh="在 Google Play 下载" data-en="Get it on">在 Google Play 下载</div>
+            <div class="text-base font-bold">Google Play</div>
+          </div>
+        </a>
+      </div>
+
+      <p class="text-white/30 text-sm font-display cn" data-zh="支持 iOS 13+ 和 Android 7.0+"
+        data-en="Requires iOS 13+ or Android 7.0+">支持 iOS 13+ 和 Android 7.0+</p>
     </div>
+  </section>
 
-    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
-      <!-- Amazon -->
-      <a href="#" class="feat-card flex flex-col items-center text-center gap-4 group no-underline fade-in fade-in-delay-1">
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition group-hover:scale-110"
-             style="background:linear-gradient(135deg,#ff9900,#e88a00)">
-          <i class="fab fa-amazon text-white text-2xl"></i>
+  <!-- ╔════════════════════════════════════╗ -->
+  <!-- ║  FOOTER                            ║ -->
+  <!-- ╚════════════════════════════════════╝ -->
+  <footer class="py-10 px-4 md:px-8" style="background:var(--clr-surface);border-top:1px solid rgba(46,125,82,0.15)">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full border overflow-hidden" style="border-color:var(--clr-gold)">
+          <img src="./img/logo.png" alt="AL-FATIHA" class="w-full h-full object-contain">
         </div>
         <div>
-          <p class="font-display font-semibold text-base mb-1">Amazon</p>
-          <p class="text-xs cn" style="color:var(--clr-muted)" data-zh="全球最大电商平台" data-en="World's largest marketplace">全球最大电商平台</p>
-        </div>
-        <div class="mt-auto px-4 py-1.5 rounded-full text-xs font-display font-semibold transition group-hover:scale-105"
-             style="background:linear-gradient(135deg,#ff9900,#e88a00);color:#fff">
-          <span class="cn" data-zh="前往购买" data-en="Shop Now">前往购买</span> →
-        </div>
-      </a>
-
-      <!-- AliExpress -->
-      <a href="#" class="feat-card flex flex-col items-center text-center gap-4 group no-underline fade-in fade-in-delay-2">
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition group-hover:scale-110"
-             style="background:linear-gradient(135deg,#e84b37,#c43020)">
-          <i class="fa fa-store text-white text-2xl"></i>
-        </div>
-        <div>
-          <p class="font-display font-semibold text-base mb-1">AliExpress</p>
-          <p class="text-xs cn" style="color:var(--clr-muted)" data-zh="速卖通·全球包邮" data-en="Global shipping worldwide">速卖通·全球包邮</p>
-        </div>
-        <div class="mt-auto px-4 py-1.5 rounded-full text-xs font-display font-semibold transition group-hover:scale-105"
-             style="background:linear-gradient(135deg,#e84b37,#c43020);color:#fff">
-          <span class="cn" data-zh="前往购买" data-en="Shop Now">前往购买</span> →
-        </div>
-      </a>
-
-      <!-- Official Mall -->
-      <a href="#" class="feat-card flex flex-col items-center text-center gap-4 group no-underline fade-in fade-in-delay-3">
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition group-hover:scale-110"
-             style="background:linear-gradient(135deg,#1a4d2e,#2e7d52)">
-          <img src="/mnt/user-data/uploads/logo.png" alt="Official" class="w-10 h-10 object-contain rounded-full">
-        </div>
-        <div>
-          <p class="font-display font-semibold text-base mb-1 cn" data-zh="官方商城" data-en="Official Mall">官方商城</p>
-          <p class="text-xs cn" style="color:var(--clr-muted)" data-zh="官方直营·正品保障" data-en="Direct official store, guaranteed authentic">官方直营·正品保障</p>
-        </div>
-        <div class="mt-auto px-4 py-1.5 rounded-full text-xs font-display font-semibold transition group-hover:scale-105"
-             style="background:linear-gradient(135deg,#1a4d2e,#2e7d52);color:#e8a030">
-          <span class="cn" data-zh="前往购买" data-en="Shop Now">前往购买</span> →
-        </div>
-      </a>
-
-      <!-- Offline Dealers -->
-      <a href="#dealer-modal" onclick="showDealers(event)" class="feat-card flex flex-col items-center text-center gap-4 group no-underline fade-in fade-in-delay-4">
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition group-hover:scale-110"
-             style="background:linear-gradient(135deg,#6b5c3a,#8c7a50)">
-          <i class="fa fa-map-location-dot text-white text-2xl"></i>
-        </div>
-        <div>
-          <p class="font-display font-semibold text-base mb-1 cn" data-zh="线下经销商" data-en="Offline Dealers">线下经销商</p>
-          <p class="text-xs cn" style="color:var(--clr-muted)" data-zh="查找附近授权门店" data-en="Find authorized stores near you">查找附近授权门店</p>
-        </div>
-        <div class="mt-auto px-4 py-1.5 rounded-full text-xs font-display font-semibold transition group-hover:scale-105"
-             style="background:linear-gradient(135deg,#6b5c3a,#8c7a50);color:#fff">
-          <span class="cn" data-zh="查看地址" data-en="View Locations">查看地址</span> →
-        </div>
-      </a>
-
-    </div>
-
-    <!-- Dealer Modal (inline, no fixed position) -->
-    <div id="dealer-modal" class="hidden mt-10 rounded-2xl p-6 md:p-8 fade-in" style="background:var(--clr-surface);border:1px solid rgba(46,125,82,0.25)">
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="font-display font-semibold text-lg cn" data-zh="授权经销商列表" data-en="Authorized Dealer Locations">授权经销商列表 / Authorized Dealer Locations</h3>
-        <button onclick="closeDealers()" class="w-8 h-8 rounded-full flex items-center justify-center transition hover:scale-110"
-                style="background:rgba(46,125,82,0.1);border:none;cursor:pointer;color:var(--clr-muted)">
-          <i class="fa fa-xmark"></i>
-        </button>
-      </div>
-      <div class="grid sm:grid-cols-2 gap-4">
-        <div class="p-4 rounded-xl" style="background:rgba(46,125,82,0.06);border:1px solid rgba(46,125,82,0.15)">
-          <p class="font-display font-semibold text-sm mb-1 gold">Dubai, UAE</p>
-          <p class="text-xs" style="color:var(--clr-muted)">AL-FATIHA Islamic Goods · Mall of Emirates, Level 2</p>
-        </div>
-        <div class="p-4 rounded-xl" style="background:rgba(46,125,82,0.06);border:1px solid rgba(46,125,82,0.15)">
-          <p class="font-display font-semibold text-sm mb-1 gold">Kuala Lumpur, Malaysia</p>
-          <p class="text-xs" style="color:var(--clr-muted)">Suria KLCC · Ground Floor, Unit G-12</p>
-        </div>
-        <div class="p-4 rounded-xl" style="background:rgba(46,125,82,0.06);border:1px solid rgba(46,125,82,0.15)">
-          <p class="font-display font-semibold text-sm mb-1 gold">Istanbul, Turkey</p>
-          <p class="text-xs" style="color:var(--clr-muted)">Grand Bazaar · Row 7, Shop 234</p>
-        </div>
-        <div class="p-4 rounded-xl" style="background:rgba(46,125,82,0.06);border:1px solid rgba(46,125,82,0.15)">
-          <p class="font-display font-semibold text-sm mb-1 gold">Jakarta, Indonesia</p>
-          <p class="text-xs" style="color:var(--clr-muted)">Plaza Indonesia · Islamic Lifestyle Zone, B2</p>
+          <div class="font-display font-semibold tracking-widest text-sm" style="color:var(--clr-text)">AL-FATIHA</div>
+          <div class="font-arabic text-xs" style="color:var(--clr-muted)">الفاتحة</div>
         </div>
       </div>
-      <p class="text-xs mt-4 cn" style="color:var(--clr-muted)"
-         data-zh="如需成为授权经销商，请发邮件至 support@alfatiha-tasbih.com"
-         data-en="To become an authorized dealer, email support@alfatiha-tasbih.com">
-         如需成为授权经销商，请发邮件至 support@alfatiha-tasbih.com
-      </p>
-    </div>
 
-  </div>
-</section>
+      <div class="text-center">
+        <p style="color:var(--clr-muted);font-size:13px;" class="cn"
+          data-zh="© 2025 AL-FATIHA · S01 智能蓝牙 Tasbih 计数器 · 保留所有权利"
+          data-en="© 2025 AL-FATIHA · S01 Smart Bluetooth Tasbih · All rights reserved">
+          © 2025 AL-FATIHA · S01 智能蓝牙 Tasbih 计数器 · 保留所有权利
+        </p>
+      </div>
 
-
-<!-- ╔════════════════════════════════════╗ -->
-<!-- ║  DOWNLOAD                          ║ -->
-<!-- ╚════════════════════════════════════╝ -->
-<section id="download" class="py-24 px-4 md:px-8 hero-bg islamic-bg relative overflow-hidden">
-  <div class="hero-orb absolute top-0 right-0 w-96 h-96 opacity-30"></div>
-  <div class="max-w-3xl mx-auto text-center text-white relative z-10">
-
-    <div class="flex justify-center mb-8">
-      <div class="w-24 h-24 rounded-full border-2 overflow-hidden" style="border-color:var(--clr-gold)">
-        <img src="/mnt/user-data/uploads/logo.png" alt="AL-FATIHA" class="w-full h-full object-contain">
+      <div class="flex gap-4">
+        <a href="#" class="w-9 h-9 rounded-full flex items-center justify-center border transition hover:scale-110"
+          style="border-color:rgba(46,125,82,0.3);color:var(--clr-muted)">
+          <i class="fab fa-instagram text-sm"></i>
+        </a>
+        <a href="#" class="w-9 h-9 rounded-full flex items-center justify-center border transition hover:scale-110"
+          style="border-color:rgba(46,125,82,0.3);color:var(--clr-muted)">
+          <i class="fab fa-facebook text-sm"></i>
+        </a>
+        <a href="#" class="w-9 h-9 rounded-full flex items-center justify-center border transition hover:scale-110"
+          style="border-color:rgba(46,125,82,0.3);color:var(--clr-muted)">
+          <i class="fab fa-youtube text-sm"></i>
+        </a>
       </div>
     </div>
-
-    <div class="font-arabic text-xl mb-2 text-gold-400">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
-    <h2 class="font-arabic text-4xl md:text-5xl mb-4 cn" data-zh="立即下载 APP" data-en="Download the App Now">立即下载 APP</h2>
-    <p class="text-white/60 mb-10 max-w-lg mx-auto text-lg cn"
-       data-zh="免费下载，连接 S01 蓝牙计数器，开启您的智能礼拜旅程。"
-       data-en="Free download. Connect your S01 Bluetooth Tasbih and begin your smart worship journey.">
-       免费下载，连接 S01 蓝牙计数器，开启您的智能礼拜旅程。
-    </p>
-
-    <div class="flex flex-wrap justify-center gap-4 mb-8">
-      <a href="#" class="dl-btn dl-ios">
-        <i class="fab fa-apple text-2xl"></i>
-        <div class="text-left">
-          <div class="text-xs opacity-70 cn" data-zh="在 App Store 下载" data-en="Download on the">在 App Store 下载</div>
-          <div class="text-base font-bold">App Store</div>
-        </div>
-      </a>
-      <a href="#" class="dl-btn dl-android">
-        <i class="fab fa-google-play text-2xl"></i>
-        <div class="text-left">
-          <div class="text-xs opacity-70 cn" data-zh="在 Google Play 下载" data-en="Get it on">在 Google Play 下载</div>
-          <div class="text-base font-bold">Google Play</div>
-        </div>
-      </a>
-    </div>
-
-    <p class="text-white/30 text-sm font-display cn" data-zh="支持 iOS 13+ 和 Android 7.0+" data-en="Requires iOS 13+ or Android 7.0+">支持 iOS 13+ 和 Android 7.0+</p>
-  </div>
-</section>
+  </footer>
 
 
-<!-- ╔════════════════════════════════════╗ -->
-<!-- ║  FOOTER                            ║ -->
-<!-- ╚════════════════════════════════════╝ -->
-<footer class="py-10 px-4 md:px-8" style="background:var(--clr-surface);border-top:1px solid rgba(46,125,82,0.15)">
-  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+  <!-- ─── SCRIPTS ──────────────────────────────────────────────────── -->
+  <script>
+    /* ── Theme ──────────────────────────────────────────────────── */
+    const body = document.getElementById('body');
 
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-full border overflow-hidden" style="border-color:var(--clr-gold)">
-        <img src="/mnt/user-data/uploads/logo.png" alt="AL-FATIHA" class="w-full h-full object-contain">
-      </div>
-      <div>
-        <div class="font-display font-semibold tracking-widest text-sm" style="color:var(--clr-text)">AL-FATIHA</div>
-        <div class="font-arabic text-xs" style="color:var(--clr-muted)">الفاتحة</div>
-      </div>
-    </div>
-
-    <div class="text-center">
-      <p style="color:var(--clr-muted);font-size:13px;" class="cn"
-         data-zh="© 2025 AL-FATIHA · S01 智能蓝牙 Tasbih 计数器 · 保留所有权利"
-         data-en="© 2025 AL-FATIHA · S01 Smart Bluetooth Tasbih · All rights reserved">
-         © 2025 AL-FATIHA · S01 智能蓝牙 Tasbih 计数器 · 保留所有权利
-      </p>
-    </div>
-
-    <div class="flex gap-4">
-      <a href="#" class="w-9 h-9 rounded-full flex items-center justify-center border transition hover:scale-110"
-         style="border-color:rgba(46,125,82,0.3);color:var(--clr-muted)">
-        <i class="fab fa-instagram text-sm"></i>
-      </a>
-      <a href="#" class="w-9 h-9 rounded-full flex items-center justify-center border transition hover:scale-110"
-         style="border-color:rgba(46,125,82,0.3);color:var(--clr-muted)">
-        <i class="fab fa-facebook text-sm"></i>
-      </a>
-      <a href="#" class="w-9 h-9 rounded-full flex items-center justify-center border transition hover:scale-110"
-         style="border-color:rgba(46,125,82,0.3);color:var(--clr-muted)">
-        <i class="fab fa-youtube text-sm"></i>
-      </a>
-    </div>
-  </div>
-</footer>
-
-
-<!-- ─── SCRIPTS ──────────────────────────────────────────────────── -->
-<script>
-/* ── Theme ──────────────────────────────────────────────────── */
-const body = document.getElementById('body');
-
-function updateThemeIcon() {
-  const btn = document.getElementById('theme-toggle-btn');
-  if (!btn) return;
-  const isDark = body.classList.contains('dark');
-  btn.innerHTML = isDark ? '<i class="fa fa-moon"></i>' : '<i class="fa fa-sun"></i>';
-}
-
-function initTheme() {
-  const saved = localStorage.getItem('theme');
-  if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    body.classList.add('dark');
-  }
-  updateThemeIcon();
-}
-
-function toggleTheme() {
-  body.classList.toggle('dark');
-  localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-  updateThemeIcon();
-}
-
-initTheme();
-
-/* ── Navbar scroll ───────────────────────────────────────────── */
-const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => {
-  navbar.classList.toggle('scrolled', window.scrollY > 60);
-});
-
-/* ── Mobile menu ─────────────────────────────────────────────── */
-function toggleMenu() {
-  document.getElementById('mobile-menu').classList.toggle('hidden');
-}
-function closeMenu() {
-  document.getElementById('mobile-menu').classList.add('hidden');
-}
-
-/* ── Language ────────────────────────────────────────────────── */
-let currentLang = 'zh';
-
-function toggleLangDropdown() {
-  document.getElementById('lang-dropdown').classList.toggle('open');
-}
-
-document.addEventListener('click', function(e) {
-  const dd = document.getElementById('lang-dropdown');
-  if (dd && !dd.contains(e.target)) dd.classList.remove('open');
-});
-
-function setLang(lang) {
-  currentLang = lang;
-  const label = document.getElementById('lang-label');
-  if (label) label.textContent = lang === 'zh' ? '中' : 'EN';
-  document.getElementById('btn-zh').classList.toggle('active', lang === 'zh');
-  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
-  document.getElementById('lang-dropdown').classList.remove('open');
-
-  document.querySelectorAll('.cn').forEach(el => {
-    const val = el.getAttribute('data-' + lang);
-    if (val) el.innerHTML = val;
-  });
-}
-
-/* ── Animate counters ────────────────────────────────────────── */
-function animateCounter(el, target, duration = 1800) {
-  let start = null;
-  const step = ts => {
-    if (!start) start = ts;
-    const progress = Math.min((ts - start) / duration, 1);
-    el.textContent = Math.floor(progress * target).toLocaleString();
-    if (progress < 1) requestAnimationFrame(step);
-    else el.textContent = target.toLocaleString();
-  };
-  requestAnimationFrame(step);
-}
-
-/* ── Intersection Observer ───────────────────────────────────── */
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-      observer.unobserve(e.target);
+    function updateThemeIcon() {
+      const btn = document.getElementById('theme-toggle-btn');
+      if (!btn) return;
+      const isDark = body.classList.contains('dark');
+      btn.innerHTML = isDark ? '<i class="fa fa-moon"></i>' : '<i class="fa fa-sun"></i>';
     }
-  });
-}, { threshold: 0.15 });
 
-document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-const counterObserver = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      const target = parseInt(e.target.getAttribute('data-target'));
-      if (target) animateCounter(e.target, target);
-      counterObserver.unobserve(e.target);
+    function initTheme() {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        body.classList.add('dark');
+      }
+      updateThemeIcon();
     }
-  });
-}, { threshold: 0.5 });
 
-document.querySelectorAll('[data-target]').forEach(el => counterObserver.observe(el));
+    function toggleTheme() {
+      body.classList.toggle('dark');
+      localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+      updateThemeIcon();
+    }
 
-/* ── Tasbih Demo ─────────────────────────────────────────────── */
-let channel = 33;
-let count = 0;
-let laps = 0;
-let today = 0;
-let vibrating = false;
+    initTheme();
 
-function setChannel(n) {
-  // recalculate laps
-  laps = Math.floor((today) / n);
-  channel = n;
-  document.querySelectorAll('.ch-btn').forEach(btn => {
-    const isCurrent = parseInt(btn.textContent) === n;
-    btn.style.background = isCurrent ? 'var(--clr-gold)' : 'transparent';
-    btn.style.color = isCurrent ? '#0d2e1a' : '';
-    btn.style.borderColor = isCurrent ? 'transparent' : '';
-  });
-  renderBeads();
-  updateDisplay();
-}
+    /* ── Navbar scroll ───────────────────────────────────────────── */
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 60);
+    });
 
-function renderBeads() {
-  const grid = document.getElementById('bead-grid');
-  grid.innerHTML = '';
-  for (let i = 0; i < channel; i++) {
-    const b = document.createElement('div');
-    b.className = 'tasbih-bead' + (i < count ? ' lit' : '');
-    grid.appendChild(b);
-  }
-}
+    /* ── Mobile menu ─────────────────────────────────────────────── */
+    function toggleMenu() {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    }
+    function closeMenu() {
+      document.getElementById('mobile-menu').classList.add('hidden');
+    }
 
-function updateDisplay() {
-  document.getElementById('tasbih-count').textContent = count;
-  document.getElementById('tasbih-laps').textContent = laps;
-  document.getElementById('tasbih-today').textContent = today;
-}
+    /* ── Language ────────────────────────────────────────────────── */
+    let currentLang = 'zh';
 
-function vibrateEffect() {
-  if (vibrating) return;
-  vibrating = true;
-  const btn = document.getElementById('tap-btn');
-  btn.style.boxShadow = '0 0 0 20px rgba(212,136,42,0.5)';
-  btn.style.transform = 'scale(0.92)';
-  setTimeout(() => {
-    btn.style.boxShadow = '0 0 0 8px rgba(212,136,42,0.25)';
-    btn.style.transform = '';
-    vibrating = false;
-  }, 400);
-  if ('vibrate' in navigator) navigator.vibrate(200);
-}
+    function toggleLangDropdown() {
+      document.getElementById('lang-dropdown').classList.toggle('open');
+    }
 
-function tapCount() {
-  count++;
-  today++;
-  if (count >= channel) {
-    count = 0;
-    laps++;
-    vibrateEffect();
-  }
-  renderBeads();
-  updateDisplay();
-}
+    document.addEventListener('click', function (e) {
+      const dd = document.getElementById('lang-dropdown');
+      if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+    });
 
-function resetCount() {
-  count = 0; laps = 0; today = 0;
-  renderBeads();
-  updateDisplay();
-}
+    function setLang(lang) {
+      currentLang = lang;
+      const label = document.getElementById('lang-label');
+      if (label) label.textContent = lang === 'zh' ? '中' : 'EN';
+      document.getElementById('btn-zh').classList.toggle('active', lang === 'zh');
+      document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+      document.getElementById('lang-dropdown').classList.remove('open');
 
-document.addEventListener('keydown', e => {
-  if (e.code === 'Space' && !e.repeat) { e.preventDefault(); tapCount(); }
-});
+      document.querySelectorAll('.cn').forEach(el => {
+        const val = el.getAttribute('data-' + lang);
+        if (val) el.innerHTML = val;
+      });
+    }
 
-setChannel(33);
+    /* ── Animate counters ────────────────────────────────────────── */
+    function animateCounter(el, target, duration = 1800) {
+      let start = null;
+      const step = ts => {
+        if (!start) start = ts;
+        const progress = Math.min((ts - start) / duration, 1);
+        el.textContent = Math.floor(progress * target).toLocaleString();
+        if (progress < 1) requestAnimationFrame(step);
+        else el.textContent = target.toLocaleString();
+      };
+      requestAnimationFrame(step);
+    }
 
-/* ── FAQ Accordion ───────────────────────────────────────────── */
-function toggleFaq(item) {
-  const answer = item.querySelector('.faq-answer');
-  const icon = item.querySelector('.faq-icon');
-  const isOpen = !answer.classList.contains('hidden');
+    /* ── Intersection Observer ───────────────────────────────────── */
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
 
-  // Close all
-  document.querySelectorAll('.faq-item').forEach(f => {
-    f.querySelector('.faq-answer').classList.add('hidden');
-    f.querySelector('.faq-icon').style.transform = '';
-  });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
-  if (!isOpen) {
-    answer.classList.remove('hidden');
-    icon.style.transform = 'rotate(180deg)';
-  }
-}
+    const counterObserver = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const target = parseInt(e.target.getAttribute('data-target'));
+          if (target) animateCounter(e.target, target);
+          counterObserver.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.5 });
 
-/* ── Captcha ─────────────────────────────────────────────────── */
-let captchaCode = '';
+    document.querySelectorAll('[data-target]').forEach(el => counterObserver.observe(el));
 
-function genCaptcha() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  captchaCode = Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-  const box = document.getElementById('captcha-box');
-  if (box) box.textContent = captchaCode;
-}
+    /* ── Tasbih Demo ─────────────────────────────────────────────── */
+    let channel = 33;
+    let count = 0;
+    let laps = 0;
+    let today = 0;
+    let vibrating = false;
 
-function refreshCaptcha() { genCaptcha(); }
+    function setChannel(n) {
+      // recalculate laps
+      laps = Math.floor((today) / n);
+      channel = n;
+      document.querySelectorAll('.ch-btn').forEach(btn => {
+        const isCurrent = parseInt(btn.textContent) === n;
+        btn.style.background = isCurrent ? 'var(--clr-gold)' : 'transparent';
+        btn.style.color = isCurrent ? '#0d2e1a' : '';
+        btn.style.borderColor = isCurrent ? 'transparent' : '';
+      });
+      renderBeads();
+      updateDisplay();
+    }
 
-genCaptcha();
+    function renderBeads() {
+      const grid = document.getElementById('bead-grid');
+      grid.innerHTML = '';
+      for (let i = 0; i < channel; i++) {
+        const b = document.createElement('div');
+        b.className = 'tasbih-bead' + (i < count ? ' lit' : '');
+        grid.appendChild(b);
+      }
+    }
 
-/* ── Contact Form Submit ──────────────────────────────────────── */
-function submitForm() {
-  const name = document.getElementById('f-name').value.trim();
-  const email = document.getElementById('f-email').value.trim();
-  const msg = document.getElementById('f-msg').value.trim();
-  const captchaInput = document.getElementById('f-captcha').value.trim().toUpperCase();
-  const errEl = document.getElementById('captcha-err');
+    function updateDisplay() {
+      document.getElementById('tasbih-count').textContent = count;
+      document.getElementById('tasbih-laps').textContent = laps;
+      document.getElementById('tasbih-today').textContent = today;
+    }
 
-  if (!name || !email || !msg) {
-    errEl.textContent = currentLang === 'zh' ? '请填写必填项（姓名、邮箱、留言内容）' : 'Please fill in required fields (Name, Email, Message)';
-    errEl.classList.remove('hidden');
-    return;
-  }
-  if (captchaInput !== captchaCode) {
-    errEl.textContent = currentLang === 'zh' ? '验证码错误，请重新输入' : 'Incorrect verification code, please try again';
-    errEl.classList.remove('hidden');
+    function vibrateEffect() {
+      if (vibrating) return;
+      vibrating = true;
+      const btn = document.getElementById('tap-btn');
+      btn.style.boxShadow = '0 0 0 20px rgba(212,136,42,0.5)';
+      btn.style.transform = 'scale(0.92)';
+      setTimeout(() => {
+        btn.style.boxShadow = '0 0 0 8px rgba(212,136,42,0.25)';
+        btn.style.transform = '';
+        vibrating = false;
+      }, 400);
+      if ('vibrate' in navigator) navigator.vibrate(200);
+    }
+
+    function tapCount() {
+      count++;
+      today++;
+      if (count >= channel) {
+        count = 0;
+        laps++;
+        vibrateEffect();
+      }
+      renderBeads();
+      updateDisplay();
+    }
+
+    function resetCount() {
+      count = 0; laps = 0; today = 0;
+      renderBeads();
+      updateDisplay();
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.code === 'Space' && !e.repeat) { e.preventDefault(); tapCount(); }
+    });
+
+    setChannel(33);
+
+    /* ── FAQ Accordion ───────────────────────────────────────────── */
+    function toggleFaq(item) {
+      const answer = item.querySelector('.faq-answer');
+      const icon = item.querySelector('.faq-icon');
+      const isOpen = !answer.classList.contains('hidden');
+
+      // Close all
+      document.querySelectorAll('.faq-item').forEach(f => {
+        f.querySelector('.faq-answer').classList.add('hidden');
+        f.querySelector('.faq-icon').style.transform = '';
+      });
+
+      if (!isOpen) {
+        answer.classList.remove('hidden');
+        icon.style.transform = 'rotate(180deg)';
+      }
+    }
+
+    /* ── Captcha ─────────────────────────────────────────────────── */
+    let captchaCode = '';
+
+    function genCaptcha() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      captchaCode = Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+      const box = document.getElementById('captcha-box');
+      if (box) box.textContent = captchaCode;
+    }
+
+    function refreshCaptcha() { genCaptcha(); }
+
     genCaptcha();
-    document.getElementById('f-captcha').value = '';
-    return;
-  }
 
-  errEl.classList.add('hidden');
-  document.getElementById('contact-form').classList.add('hidden');
-  document.getElementById('form-success').classList.remove('hidden');
-}
+    /* ── Contact Form Submit ──────────────────────────────────────── */
+    function submitForm() {
+      const name = document.getElementById('f-name').value.trim();
+      const email = document.getElementById('f-email').value.trim();
+      const msg = document.getElementById('f-msg').value.trim();
+      const captchaInput = document.getElementById('f-captcha').value.trim().toUpperCase();
+      const errEl = document.getElementById('captcha-err');
 
-/* ── Dealer Modal ────────────────────────────────────────────── */
-function showDealers(e) {
-  e.preventDefault();
-  const modal = document.getElementById('dealer-modal');
-  modal.classList.remove('hidden');
-  modal.classList.add('visible');
-  setTimeout(() => modal.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
-}
+      if (!name || !email || !msg) {
+        errEl.textContent = currentLang === 'zh' ? '请填写必填项（姓名、邮箱、留言内容）' : 'Please fill in required fields (Name, Email, Message)';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      if (captchaInput !== captchaCode) {
+        errEl.textContent = currentLang === 'zh' ? '验证码错误，请重新输入' : 'Incorrect verification code, please try again';
+        errEl.classList.remove('hidden');
+        genCaptcha();
+        document.getElementById('f-captcha').value = '';
+        return;
+      }
 
-function closeDealers() {
-  document.getElementById('dealer-modal').classList.add('hidden');
-}
+      errEl.classList.add('hidden');
+      document.getElementById('contact-form').classList.add('hidden');
+      document.getElementById('form-success').classList.remove('hidden');
+    }
 
-const prayers = [
-  { name: 'Fajr',    time: '5:50', active: true },
-  { name: 'Shuroq',  time: '5:50', active: false },
-  { name: 'Dhuhr',   time: '5:50', active: false },
-  { name: 'Asr',     time: '5:50', active: false },
-  { name: 'Maghrib', time: '5:50', active: false },
-  { name: 'Isha',    time: '5:50', active: false },
-];
+    /* ── Dealer Modal ────────────────────────────────────────────── */
+    function showDealers(e) {
+      e.preventDefault();
+      const modal = document.getElementById('dealer-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('visible');
+      setTimeout(() => modal.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+    }
 
-const list = document.getElementById('prayer-list');
-prayers.forEach(p => {
-  const div = document.createElement('div');
-  div.className = 'prayer-item' + (p.active ? ' active' : '');
-  div.innerHTML = `<span style="font-family:'Josefin Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:.05em">${p.name}</span>
+    function closeDealers() {
+      document.getElementById('dealer-modal').classList.add('hidden');
+    }
+
+    const prayers = [
+      { name: 'Fajr', time: '5:50', active: true },
+      { name: 'Shuroq', time: '5:50', active: false },
+      { name: 'Dhuhr', time: '5:50', active: false },
+      { name: 'Asr', time: '5:50', active: false },
+      { name: 'Maghrib', time: '5:50', active: false },
+      { name: 'Isha', time: '5:50', active: false },
+    ];
+
+    const list = document.getElementById('prayer-list');
+    prayers.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'prayer-item' + (p.active ? ' active' : '');
+      div.innerHTML = `<span style="font-family:'Josefin Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:.05em">${p.name}</span>
     <div style="display:flex;align-items:center;gap:8px">
       <span style="font-family:'Josefin Sans',sans-serif;font-size:13px;color:${p.active ? '#e8a030' : 'rgba(255,255,255,0.7)'}">${p.time}</span>
       <i class="fa fa-bell" style="font-size:11px;color:${p.active ? '#e8a030' : 'rgba(255,255,255,0.2)'}"></i>
     </div>`;
-  list.appendChild(div);
-});
-</script>
+      list.appendChild(div);
+    });
+  </script>
 </body>
+
 </html>
