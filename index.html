@@ -2339,7 +2339,7 @@
       }
       try {
         // Step 1: get coordinates via IP geolocation (ip2location.io)
-        const geoRes = await fetch('https://api.ip2location.io/?key=126E6AECB54B3415DF539D1E72B63C57', { signal: AbortSignal.timeout(5000) });
+        const geoRes = await fetch('https://api.ip2location.io/json/?key=126E6AECB54B3415DF539D1E72B63C57', { signal: AbortSignal.timeout(5000) });
         const geo = await geoRes.json();
         const lat = geo.latitude || 39.9042;
         const lng = geo.longitude || 116.4074;
