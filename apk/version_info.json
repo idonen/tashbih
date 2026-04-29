@@ -1,0 +1,9 @@
+{
+  "versionCode": 5,
+  "versionName": "1.0.5",
+  "apkUrl": "https://idonen.github.io/tashbih/apk/Tasbih.apk",
+  "updateLog": "1. 修改设备蓝牙连接问题\n2. 修复细节问题",
+  "isForceUpdate": false,
+  "fileSize": "20904581",
+  "releaseDate": "2026-04-30"
+}
