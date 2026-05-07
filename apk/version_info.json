@@ -1,9 +1,9 @@
 {
-  "versionCode": 7,
-  "versionName": "1.0.7",
+  "versionCode": 8,
+  "versionName": "1.0.8",
   "apkUrl": "https://idonen.github.io/tashbih/apk/Tasbih.apk",
-  "updateLog": "1. 修改多语言问题",
+  "updateLog": "1. 修改蓝牙自动连接问题",
   "isForceUpdate": false,
   "fileSize": "20904581",
-  "releaseDate": "2026-05-03"
+  "releaseDate": "2026-05-08"
 }
