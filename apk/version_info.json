@@ -1,9 +1,9 @@
 {
-  "versionCode": 8,
-  "versionName": "1.0.8",
-  "apkUrl": "https://idonen.github.io/tashbih/apk/Tasbih.apk",
+  "versionCode": 9,
+  "versionName": "1.0.9",
+  "apkUrl": "https://idonen.github.io/tashbih/apk/AL-FATIHA.apk",
   "updateLog": "1. 修改蓝牙自动连接问题",
   "isForceUpdate": false,
   "fileSize": "20904581",
-  "releaseDate": "2026-05-08"
+  "releaseDate": "2026-05-10"
 }
