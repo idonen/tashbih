@@ -1,9 +1,9 @@
 {
-  "versionCode": 10,
-  "versionName": "1.1.0",
+  "versionCode": 11,
+  "versionName": "1.1.1",
   "apkUrl": "https://idonen.github.io/tashbih/apk/AL-FATIHA.apk",
-  "updateLog": "1. 修改蓝牙自动连接问题",
+  "updateLog": "1. 修改所有清零的问题",
   "isForceUpdate": false,
   "fileSize": "20904581",
-  "releaseDate": "2026-05-10"
+  "releaseDate": "2026-05-17"
 }
