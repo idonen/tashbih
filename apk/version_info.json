@@ -1,9 +1,9 @@
 {
-  "versionCode": 12,
-  "versionName": "1.1.2",
+  "versionCode": 13,
+  "versionName": "1.1.3",
   "apkUrl": "https://idonen.github.io/tashbih/apk/AL-FATIHA.apk",
-  "updateLog": "1. 修改设备切换的问题",
+  "updateLog": "1.Add multilingual translation",
   "isForceUpdate": false,
   "fileSize": "20904581",
-  "releaseDate": "2026-05-17"
+  "releaseDate": "2026-05-30"
 }
