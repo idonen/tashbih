@@ -1,0 +1,1980 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>祈祷时间 · Prayer Times | AL-FATIHA</title>
+
+  <!-- ─── SEO ──────────────────────────────────────────────────── -->
+  <meta name="description"
+    content="AL-FATIHA 祈祷时间计算器 — 根据您的地理位置精准计算每日五次礼拜时间，支持全球各地区、多种计算方法。">
+  <meta name="keywords" content="祈祷时间, Prayer Times, Salah, Fajr, Dhuhr, Asr, Maghrib, Isha, 礼拜, 伊斯兰, Islamic">
+  <meta name="author" content="AL-FATIHA">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Serif+SC:wght@300;400;600;700&family=Josefin+Sans:wght@300;400;600;700&display=swap"
+    rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            emerald: { 950: '#022c22' },
+            gold: {
+              400: '#e8a030',
+              500: '#d4882a',
+              600: '#b87020',
+            }
+          },
+          fontFamily: {
+            arabic: ['Amiri', 'serif'],
+            serif: ['Noto Serif SC', 'serif'],
+            display: ['Josefin Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* ─── CSS Variables ─────────────────────────────────── */
+    :root {
+      --clr-bg: #f7f5f0;
+      --clr-surface: #ffffff;
+      --clr-green: #1a4d2e;
+      --clr-green2: #2e7d52;
+      --clr-gold: #d4882a;
+      --clr-text: #1a1a1a;
+      --clr-muted: #5a5a5a;
+      --pat-opacity: 0.06;
+    }
+
+    .dark {
+      --clr-bg: #0d1f14;
+      --clr-surface: #112318;
+      --clr-green: #2e7d52;
+      --clr-green2: #3fa06a;
+      --clr-gold: #e8a030;
+      --clr-text: #f0ebe0;
+      --clr-muted: #a0a090;
+      --pat-opacity: 0.10;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--clr-bg);
+      color: var(--clr-text);
+      font-family: 'Noto Serif SC', serif;
+      transition: background 0.4s, color 0.4s;
+      min-height: 100vh;
+    }
+
+    /* ─── Islamic Geometric Pattern ────────────────────── */
+    .islamic-bg {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .islamic-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='0.6'%3E%3Cpolygon points='40,5 55,14 55,32 40,41 25,32 25,14'/%3E%3Cpolygon points='40,39 55,48 55,66 40,75 25,66 25,48'/%3E%3Cpolygon points='5,22 20,13 20,31 5,40 -10,31 -10,13'/%3E%3Cpolygon points='75,22 90,13 90,31 75,40 60,31 60,13'/%3E%3Cpolygon points='5,58 20,49 20,67 5,76 -10,67 -10,49'/%3E%3Cpolygon points='75,58 90,49 90,67 75,76 60,67 60,49'/%3E%3C/g%3E%3C/svg%3E");
+      opacity: var(--pat-opacity);
+      pointer-events: none;
+    }
+
+    /* ─── Navigation ────────────────────────────────────── */
+    #navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: transparent;
+      transition: background 0.35s, backdrop-filter 0.35s, box-shadow 0.35s;
+    }
+
+    #navbar.scrolled {
+      background: var(--clr-surface);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 2px 24px rgba(0,0,0,0.12);
+    }
+
+    .nav-link { transition: color 0.2s, opacity 0.2s; }
+    #navbar.scrolled .nav-link { color: var(--clr-muted); }
+    #navbar.scrolled .nav-link:hover { color: var(--clr-text); }
+    #navbar.scrolled #menu-btn { color: var(--clr-text); }
+
+    /* ─── Hero ──────────────────────────────────────────── */
+    .hero-bg {
+      background: linear-gradient(160deg, #0d2e1a 0%, #1a4d2e 45%, #0f3d26 100%);
+    }
+
+    .hero-orb {
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212,136,42,0.18) 0%, transparent 70%);
+      animation: pulse-orb 4s ease-in-out infinite;
+    }
+
+    @keyframes pulse-orb {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.12); opacity: 1; }
+    }
+
+    /* ─── Logo ──────────────────────────────────────────── */
+    .logo-ring {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid var(--clr-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+
+    /* ─── Theme & Lang Buttons ───────────────────────────── */
+    .theme-icon-btn {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: transparent;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+      flex-shrink: 0;
+    }
+    .theme-icon-btn:hover { transform: scale(1.1); }
+    #navbar.scrolled .theme-icon-btn { border-color: rgba(26,77,46,0.3); color: var(--clr-text); }
+    .theme-icon-btn .fa-sun { color: #f59e0b; }
+    .theme-icon-btn .fa-moon { color: #818cf8; }
+
+    /* ─── Lang Dropdown ──────────────────────────────────── */
+    .lang-dropdown { position: relative; }
+    .lang-dropdown-btn {
+      display: flex; align-items: center; gap: 4px;
+      padding: 5px 10px; border-radius: 6px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff; background: transparent;
+    }
+    .lang-dropdown-btn i { font-size: 10px; transition: transform 0.2s; }
+    .lang-dropdown.open .lang-dropdown-btn i { transform: rotate(180deg); }
+    #navbar.scrolled .lang-dropdown-btn { border-color: rgba(26,77,46,0.3); color: var(--clr-text); }
+    .lang-dropdown-menu {
+      position: absolute; top: 100%; right: 0; margin-top: 6px;
+      background: var(--clr-surface);
+      border: 1px solid rgba(46,125,82,0.2);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      overflow: hidden;
+      opacity: 0; visibility: hidden;
+      transform: translateY(-8px);
+      transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+      z-index: 200; min-width: 100px;
+    }
+    .lang-dropdown.open .lang-dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+    .lang-dropdown-menu a {
+      display: block; padding: 8px 16px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 13px; font-weight: 500;
+      color: var(--clr-text);
+      transition: background 0.15s;
+      cursor: pointer; text-decoration: none;
+    }
+    .lang-dropdown-menu a:hover { background: rgba(46,125,82,0.08); }
+    .lang-dropdown-menu a.active { color: var(--clr-gold); font-weight: 700; }
+
+    /* ─── Divider Gem ───────────────────────────────────── */
+    .divider-gem {
+      display: flex; align-items: center; gap: 12px;
+      margin: 0 auto 16px; width: fit-content;
+    }
+    .divider-gem::before, .divider-gem::after {
+      content: ''; display: block;
+      width: 48px; height: 1px;
+      background: var(--clr-gold); opacity: 0.6;
+    }
+    .divider-gem span { color: var(--clr-gold); font-size: 18px; }
+
+    /* ─── Fade-in ────────────────────────────────────────── */
+    .fade-in {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: none; }
+    .fade-in-delay-1 { transition-delay: 0.1s; }
+    .fade-in-delay-2 { transition-delay: 0.2s; }
+    .fade-in-delay-3 { transition-delay: 0.3s; }
+    .fade-in-delay-4 { transition-delay: 0.4s; }
+
+    /* ─── Prayer Cards ───────────────────────────────────── */
+    .prayer-card {
+      background: var(--clr-surface);
+      border: 1px solid rgba(46,125,82,0.2);
+      border-radius: 18px;
+      padding: 24px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s;
+      cursor: default;
+    }
+
+    .prayer-card::after {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: 18px;
+      border: 1px solid transparent;
+      transition: border-color 0.25s;
+      pointer-events: none;
+    }
+
+    .prayer-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(26,77,46,0.15);
+    }
+
+    .prayer-card:hover::after { border-color: var(--clr-gold); }
+
+    .prayer-card.active-prayer {
+      background: linear-gradient(135deg, rgba(26,77,46,0.15) 0%, rgba(26,77,46,0.05) 100%);
+      border-color: var(--clr-gold);
+      box-shadow: 0 8px 32px rgba(212,136,42,0.2);
+    }
+
+    .prayer-card.active-prayer::after { border-color: var(--clr-gold); }
+
+    .prayer-icon {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a4d2e, #2e7d52);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+      color: #e8a030; font-size: 20px;
+      transition: transform 0.3s;
+    }
+
+    .prayer-card:hover .prayer-icon,
+    .prayer-card.active-prayer .prayer-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .active-prayer .prayer-icon {
+      background: linear-gradient(135deg, var(--clr-gold), #b87020);
+      color: #fff;
+    }
+
+    .prayer-name {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--clr-muted); margin-bottom: 4px;
+    }
+
+    .prayer-arabic {
+      font-family: 'Amiri', serif;
+      font-size: 20px;
+      color: var(--clr-green2);
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+
+    .prayer-time {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 28px; font-weight: 700;
+      color: var(--clr-text);
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+
+    .active-prayer .prayer-time { color: var(--clr-gold); }
+
+    .prayer-badge {
+      position: absolute; top: 12px; right: 12px;
+      background: var(--clr-gold);
+      color: #0d2e1a;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 3px 8px; border-radius: 999px;
+      text-transform: uppercase;
+      opacity: 0; transform: scale(0.8);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .active-prayer .prayer-badge { opacity: 1; transform: scale(1); }
+
+    /* ─── Countdown ──────────────────────────────────────── */
+    .countdown-block {
+      background: linear-gradient(135deg, #1a4d2e 0%, #0d2e1a 100%);
+      border-radius: 16px;
+      padding: 20px 28px;
+      color: #fff;
+    }
+
+    .countdown-digits {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 48px; font-weight: 700;
+      color: var(--clr-gold);
+      letter-spacing: -2px; line-height: 1;
+    }
+
+    /* ─── Settings Panel ─────────────────────────────────── */
+    .settings-panel {
+      background: var(--clr-surface);
+      border: 1px solid rgba(46,125,82,0.2);
+      border-radius: 18px;
+      padding: 28px;
+    }
+
+    .settings-label {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--clr-muted);
+      margin-bottom: 8px; display: block;
+    }
+
+    .settings-input, .settings-select {
+      width: 100%;
+      background: var(--clr-bg);
+      border: 1px solid rgba(46,125,82,0.25);
+      border-radius: 10px;
+      color: var(--clr-text);
+      font-family: 'Noto Serif SC', serif;
+      font-size: 14px;
+      padding: 10px 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      appearance: none;
+    }
+
+    .settings-input:focus, .settings-select:focus {
+      border-color: var(--clr-gold);
+      box-shadow: 0 0 0 3px rgba(212,136,42,0.12);
+    }
+
+    .settings-select-wrapper {
+      position: relative;
+    }
+
+    .settings-select-wrapper::after {
+      content: '\f107';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute; right: 14px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--clr-gold); pointer-events: none;
+      font-size: 13px;
+    }
+
+    /* ─── Search results ─────────────────────────────────── */
+    .search-results {
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: var(--clr-surface);
+      border: 1px solid rgba(46,125,82,0.25);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+      z-index: 50;
+      max-height: 200px; overflow-y: auto;
+    }
+
+    .search-result-item {
+      padding: 10px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-family: 'Josefin Sans', sans-serif;
+      border-bottom: 1px solid rgba(46,125,82,0.08);
+      color: var(--clr-text);
+    }
+
+    .search-result-item:last-child { border-bottom: none; }
+    .search-result-item:hover { background: rgba(46,125,82,0.08); }
+    .search-result-item .city-country { color: var(--clr-muted); font-size: 11px; }
+
+    /* ─── Calendar Strip ─────────────────────────────────── */
+    .cal-day {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 10px 14px; border-radius: 12px; cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      min-width: 52px;
+      border: 1px solid transparent;
+    }
+
+    .cal-day:hover { background: rgba(46,125,82,0.08); transform: translateY(-2px); }
+
+    .cal-day.active {
+      background: var(--clr-green);
+      border-color: var(--clr-gold);
+      transform: translateY(-2px);
+    }
+
+    .cal-day-name {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--clr-muted);
+    }
+
+    .cal-day.active .cal-day-name { color: rgba(255,255,255,0.7); }
+
+    .cal-day-num {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 20px; font-weight: 700;
+      color: var(--clr-text); line-height: 1.2;
+    }
+
+    .cal-day.active .cal-day-num { color: var(--clr-gold); }
+
+    .cal-day-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--clr-gold); margin-top: 4px;
+      opacity: 0;
+    }
+
+    .cal-day.active .cal-day-dot { opacity: 1; }
+
+    /* ─── Qibla & Info Cards ─────────────────────────────── */
+    .info-card {
+      background: var(--clr-surface);
+      border: 1px solid rgba(46,125,82,0.2);
+      border-radius: 16px;
+      padding: 22px;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .info-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(26,77,46,0.12);
+    }
+
+    /* ─── Hijri Calendar ─────────────────────────────────── */
+    .hijri-display {
+      font-family: 'Amiri', serif;
+      font-size: 22px; color: var(--clr-gold);
+      line-height: 1.3;
+    }
+
+    /* ─── Progress Arc ───────────────────────────────────── */
+    .day-progress {
+      position: relative; width: 120px; height: 120px;
+    }
+
+    .day-progress svg { transform: rotate(-90deg); }
+    .day-progress .progress-text {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-family: 'Josefin Sans', sans-serif;
+    }
+
+    /* ─── Method Pills ───────────────────────────────────── */
+    .method-pill {
+      padding: 6px 14px; border-radius: 999px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+      cursor: pointer;
+      border: 1px solid rgba(46,125,82,0.25);
+      color: var(--clr-muted);
+      background: transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .method-pill:hover { border-color: var(--clr-gold); color: var(--clr-gold); }
+    .method-pill.active {
+      background: var(--clr-green);
+      border-color: var(--clr-gold);
+      color: var(--clr-gold);
+    }
+
+    /* ─── Table Row ──────────────────────────────────────── */
+    .week-row {
+      display: grid;
+      grid-template-columns: 100px repeat(6, 1fr);
+      gap: 0;
+      border-bottom: 1px solid rgba(46,125,82,0.1);
+      padding: 10px 0;
+      transition: background 0.15s;
+      align-items: center;
+    }
+    .week-row:hover { background: rgba(46,125,82,0.04); }
+    .week-row.header-row {
+      border-bottom: 2px solid rgba(46,125,82,0.2);
+      padding-bottom: 12px; margin-bottom: 0;
+    }
+    .week-row .cell {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 12px; text-align: center;
+      padding: 4px 2px;
+    }
+    .week-row.header-row .cell {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--clr-muted);
+    }
+    .week-row .cell.date-cell {
+      text-align: left; padding-left: 4px;
+      font-weight: 600; color: var(--clr-text);
+    }
+    .week-row .cell.time-cell { color: var(--clr-muted); }
+    .week-row.today-row { background: rgba(212,136,42,0.06); }
+    .week-row.today-row .cell.date-cell { color: var(--clr-gold); font-weight: 700; }
+
+    /* ─── Location permission banner ─────────────────────── */
+    .location-banner {
+      background: linear-gradient(135deg, rgba(26,77,46,0.12), rgba(46,125,82,0.08));
+      border: 1px solid rgba(46,125,82,0.25);
+      border-radius: 14px; padding: 16px 20px;
+    }
+
+    /* ─── Notification Bell ──────────────────────────────── */
+    .notif-toggle {
+      width: 32px; height: 18px; border-radius: 9px;
+      background: rgba(46,125,82,0.25);
+      position: relative; cursor: pointer;
+      transition: background 0.25s;
+      border: none; flex-shrink: 0;
+    }
+    .notif-toggle.on { background: var(--clr-green2); }
+    .notif-toggle::after {
+      content: '';
+      position: absolute; top: 3px; left: 3px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: #fff;
+      transition: transform 0.25s;
+    }
+    .notif-toggle.on::after { transform: translateX(14px); }
+
+    /* ─── Qibla compass ──────────────────────────────────── */
+    .qibla-compass {
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      border: 2px solid rgba(46,125,82,0.3);
+      background: var(--clr-bg);
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto;
+    }
+
+    .qibla-compass .compass-ring {
+      position: absolute; inset: 6px;
+      border-radius: 50%;
+      border: 1px dashed rgba(212,136,42,0.3);
+    }
+
+    .qibla-needle {
+      width: 3px;
+      border-radius: 2px;
+      position: absolute; bottom: 50%; left: 50%;
+      transform-origin: bottom center;
+      transform: translateX(-50%) rotate(0deg);
+      transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* ─── Footer ─────────────────────────────────────────── */
+    .footer-link {
+      color: var(--clr-muted); font-size: 13px;
+      transition: color 0.2s;
+    }
+    .footer-link:hover { color: var(--clr-gold); }
+
+    /* ─── Mobile Menu ────────────────────────────────────── */
+    #mobile-menu {
+      display: none;
+      position: fixed; inset: 0; z-index: 90;
+      background: var(--clr-surface);
+      padding: 100px 32px 32px;
+      flex-direction: column; gap: 24px;
+    }
+    #mobile-menu.open { display: flex; }
+
+    /* ─── Loading Skeleton ───────────────────────────────── */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(46,125,82,0.08) 25%, rgba(46,125,82,0.15) 50%, rgba(46,125,82,0.08) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ─── Gold color util ────────────────────────────────── */
+    .gold { color: var(--clr-gold); }
+    .clr-muted { color: var(--clr-muted); }
+
+    /* ─── Scroll hide ─────────────────────────────────────── */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* ─── Pulse dot ──────────────────────────────────────── */
+    @keyframes ping-dot {
+      0% { transform: scale(1); opacity: 1; }
+      75%, 100% { transform: scale(2); opacity: 0; }
+    }
+    .ping-dot::before {
+      content: ''; position: absolute; inset: 0;
+      border-radius: 50%; background: var(--clr-gold);
+      animation: ping-dot 1.5s cubic-bezier(0,0,0.2,1) infinite;
+    }
+
+    /* responsive week table */
+    @media (max-width: 640px) {
+      .week-row {
+        grid-template-columns: 80px repeat(6, 1fr);
+      }
+      .week-row .cell { font-size: 10px; }
+      .prayer-time { font-size: 22px; }
+      .countdown-digits { font-size: 36px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- NAVBAR                                                  -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <nav id="navbar">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center gap-6">
+
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-3 text-white no-underline">
+        <div class="logo-ring">
+          <span style="font-family:'Amiri',serif;color:var(--clr-gold);font-size:18px;font-weight:700;">بِسْم</span>
+        </div>
+        <div>
+          <div style="font-family:'Josefin Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.1em;color:#fff;">
+            AL-FATIHA</div>
+          <div style="font-size:10px;letter-spacing:0.12em;color:rgba(255,255,255,0.5);font-family:'Josefin Sans',sans-serif;text-transform:uppercase;">
+            S01 Tasbih</div>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <div class="hidden md:flex items-center gap-7 ml-8 flex-1">
+        <a href="index.html#features" class="nav-link text-white/70 hover:text-white font-display text-sm font-semibold tracking-wider uppercase no-underline" data-i18n="nav_features">功能</a>
+        <a href="index.html#how-to-use" class="nav-link text-white/70 hover:text-white font-display text-sm font-semibold tracking-wider uppercase no-underline" data-i18n="nav_how">使用方法</a>
+        <a href="prayer.html" class="nav-link font-display text-sm font-semibold tracking-wider uppercase no-underline" style="color:var(--clr-gold);" data-i18n="nav_prayer">祈祷时间</a>
+        <a href="index.html#download" class="nav-link text-white/70 hover:text-white font-display text-sm font-semibold tracking-wider uppercase no-underline" data-i18n="nav_download">下载</a>
+        <a href="index.html#contact" class="nav-link text-white/70 hover:text-white font-display text-sm font-semibold tracking-wider uppercase no-underline" data-i18n="nav_contact">联系</a>
+      </div>
+
+      <div class="ml-auto flex items-center gap-3">
+        <!-- Dark mode toggle -->
+        <button class="theme-icon-btn" id="theme-btn" aria-label="切换主题">
+          <i class="fa-solid fa-moon text-white/80" id="theme-icon"></i>
+        </button>
+
+        <!-- Language -->
+        <div class="lang-dropdown" id="lang-dropdown">
+          <button class="lang-dropdown-btn" id="lang-btn" onclick="toggleLang()">
+            <span id="lang-label">中文</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="lang-dropdown-menu" id="lang-menu">
+            <a onclick="setLang('zh')" data-lang="zh" class="active">中文</a>
+            <a onclick="setLang('en')" data-lang="en">English</a>
+            <a onclick="setLang('ar')" data-lang="ar">العربية</a>
+            <a onclick="setLang('ms')" data-lang="ms">Bahasa</a>
+          </div>
+        </div>
+
+        <!-- Mobile menu btn -->
+        <button class="md:hidden text-white text-xl" id="menu-btn" onclick="toggleMobileMenu()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu">
+    <a href="index.html#features" class="font-display text-lg font-semibold tracking-wider uppercase no-underline" style="color:var(--clr-text);" data-i18n="nav_features">功能</a>
+    <a href="index.html#how-to-use" class="font-display text-lg font-semibold tracking-wider uppercase no-underline" style="color:var(--clr-text);" data-i18n="nav_how">使用方法</a>
+    <a href="prayer.html" class="font-display text-lg font-semibold tracking-wider uppercase no-underline" style="color:var(--clr-gold);" data-i18n="nav_prayer">祈祷时间</a>
+    <a href="index.html#download" class="font-display text-lg font-semibold tracking-wider uppercase no-underline" style="color:var(--clr-text);" data-i18n="nav_download">下载</a>
+    <a href="index.html#contact" class="font-display text-lg font-semibold tracking-wider uppercase no-underline" style="color:var(--clr-text);" data-i18n="nav_contact">联系</a>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- HERO                                                    -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <header class="hero-bg islamic-bg pt-28 pb-16 px-6">
+    <!-- Decorative orbs -->
+    <div class="hero-orb absolute w-96 h-96 -top-24 -left-24 pointer-events-none"></div>
+    <div class="hero-orb absolute w-64 h-64 bottom-0 right-8 pointer-events-none" style="animation-delay:2s;"></div>
+
+    <div class="max-w-4xl mx-auto text-center text-white relative">
+      <!-- Arabic subtitle -->
+      <div class="font-arabic text-2xl text-gold-400 mb-2 opacity-90">مَوَاقِيتُ الصَّلَاة</div>
+
+      <h1 class="font-display font-bold text-4xl md:text-5xl tracking-tight mb-4" style="color:#fff;">
+        <span data-i18n="hero_title">祈祷时间</span>
+        <span class="ml-3" style="color:var(--clr-gold);">Prayer Times</span>
+      </h1>
+
+      <p class="text-white/60 text-base md:text-lg max-w-xl mx-auto mb-8 font-serif" data-i18n="hero_sub">
+        根据您的地理位置，精准计算每日五次礼拜时间
+      </p>
+
+      <!-- Live clock & date -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+        <div class="text-center">
+          <div class="font-display font-bold text-5xl" style="color:var(--clr-gold);letter-spacing:-2px;" id="live-clock">--:--:--</div>
+          <div class="text-white/50 text-xs font-display tracking-widest uppercase mt-1" id="live-date">---</div>
+        </div>
+        <div class="hidden sm:block w-px h-12 bg-white/20"></div>
+        <div class="text-center">
+          <div class="hijri-display" id="hijri-date">...</div>
+          <div class="text-white/50 text-xs font-display tracking-widest uppercase mt-1" data-i18n="hijri_label">伊斯兰历</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- MAIN CONTENT                                           -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-12 space-y-10">
+
+    <!-- ── Row 1: Settings + Countdown ────────────────────── -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Settings Panel -->
+      <div class="lg:col-span-2 settings-panel fade-in">
+        <div class="divider-gem mb-6">
+          <span><i class="fa-solid fa-gear"></i></span>
+        </div>
+        <h2 class="font-display text-center text-lg font-bold tracking-widest uppercase mb-6 clr-muted" data-i18n="settings_title">设置 / Settings</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+          <!-- City Search -->
+          <div class="sm:col-span-2">
+            <label class="settings-label" data-i18n="label_city">城市 / City</label>
+            <div class="relative" id="city-search-wrapper">
+              <div class="relative">
+                <input
+                  type="text"
+                  id="city-input"
+                  class="settings-input pr-10"
+                  placeholder="搜索城市 / Search city..."
+                  autocomplete="off"
+                  oninput="onCityInput()"
+                  onfocus="onCityFocus()"
+                >
+                <button class="absolute right-3 top-1/2 -translate-y-1/2 text-gold-500 hover:text-gold-400"
+                  onclick="detectLocation()" title="使用 GPS 定位">
+                  <i class="fa-solid fa-location-crosshairs" style="color:var(--clr-gold);"></i>
+                </button>
+              </div>
+              <div id="search-results" class="search-results" style="display:none;"></div>
+            </div>
+            <div id="location-display" class="mt-2 text-xs font-display tracking-wide" style="color:var(--clr-muted);">
+              <i class="fa-solid fa-location-dot mr-1" style="color:var(--clr-gold);"></i>
+              <span id="location-text">未设置 / Not set</span>
+            </div>
+          </div>
+
+          <!-- Calculation Method -->
+          <div>
+            <label class="settings-label" data-i18n="label_method">计算方法 / Method</label>
+            <div class="settings-select-wrapper">
+              <select id="method-select" class="settings-select" onchange="onMethodChange()">
+                <option value="MWL">MWL — 伊斯兰世界联盟</option>
+                <option value="ISNA">ISNA — 北美伊斯兰协会</option>
+                <option value="Egypt">Egypt — 埃及权威机构</option>
+                <option value="Makkah">Makkah — 麦加 (穆斯林世界联盟)</option>
+                <option value="Karachi">Karachi — 卡拉奇大学</option>
+                <option value="Tehran">Tehran — 德黑兰研究所</option>
+                <option value="Jafari">Jafari — 什叶派伊斯兰法学</option>
+                <option value="France">France — 法国伊斯兰联合会</option>
+                <option value="Russia">Russia — 俄罗斯穆斯林理事会</option>
+                <option value="Singapore">Singapore — 新加坡 MUIS</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Time Format -->
+          <div>
+            <label class="settings-label" data-i18n="label_format">时间格式 / Format</label>
+            <div class="settings-select-wrapper">
+              <select id="format-select" class="settings-select" onchange="onFormatChange()">
+                <option value="24h">24 小时制</option>
+                <option value="12h">12 小时制 AM/PM</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Asr Method -->
+          <div>
+            <label class="settings-label" data-i18n="label_asr">晡礼方法 / Asr Method</label>
+            <div class="settings-select-wrapper">
+              <select id="asr-select" class="settings-select" onchange="onAsrChange()">
+                <option value="Standard">标准 Standard (Shafi'i)</option>
+                <option value="Hanafi">哈纳菲 Hanafi</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- High Latitude -->
+          <div>
+            <label class="settings-label" data-i18n="label_highlat">高纬度方法 / High Lat.</label>
+            <div class="settings-select-wrapper">
+              <select id="highlat-select" class="settings-select" onchange="onHighLatChange()">
+                <option value="NightMiddle">夜间中点 Night Middle</option>
+                <option value="AngleBased">角度基准 Angle Based</option>
+                <option value="OneSeventh">七分之一 One Seventh</option>
+                <option value="None">不调整 None</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Method Pills -->
+        <div class="mt-6">
+          <label class="settings-label mb-3" data-i18n="label_region">常用地区 / Quick Select</label>
+          <div class="flex flex-wrap gap-2">
+            <button class="method-pill" onclick="quickCity('Makkah', 21.3891, 39.8579, 'Asia/Riyadh')">🕋 Makkah</button>
+            <button class="method-pill" onclick="quickCity('Madinah', 24.4686, 39.6142, 'Asia/Riyadh')">🌙 Madinah</button>
+            <button class="method-pill" onclick="quickCity('Cairo', 30.0444, 31.2357, 'Africa/Cairo')">🏛 Cairo</button>
+            <button class="method-pill" onclick="quickCity('Istanbul', 41.0082, 28.9784, 'Europe/Istanbul')">🕌 Istanbul</button>
+            <button class="method-pill" onclick="quickCity('Kuala Lumpur', 3.1390, 101.6869, 'Asia/Kuala_Lumpur')">🌴 KL</button>
+            <button class="method-pill" onclick="quickCity('Jakarta', -6.2088, 106.8456, 'Asia/Jakarta')">🌺 Jakarta</button>
+            <button class="method-pill" onclick="quickCity('Dubai', 25.2048, 55.2708, 'Asia/Dubai')">🏙 Dubai</button>
+            <button class="method-pill" onclick="quickCity('London', 51.5074, -0.1278, 'Europe/London')">🎡 London</button>
+            <button class="method-pill" onclick="quickCity('New York', 40.7128, -74.0060, 'America/New_York')">🗽 New York</button>
+            <button class="method-pill" onclick="quickCity('Beijing', 39.9042, 116.4074, 'Asia/Shanghai')">🏮 Beijing</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Countdown + Day Progress -->
+      <div class="flex flex-col gap-4 fade-in fade-in-delay-1">
+
+        <!-- Next Prayer Countdown -->
+        <div class="countdown-block islamic-bg flex-1">
+          <div class="text-xs font-display tracking-widest uppercase text-white/50 mb-3" data-i18n="next_prayer">下一次礼拜</div>
+          <div class="font-arabic text-3xl mb-1" style="color:var(--clr-gold);" id="next-prayer-arabic">...</div>
+          <div class="font-display text-sm font-bold tracking-wider text-white/70 mb-4" id="next-prayer-name">---</div>
+          <div class="countdown-digits" id="countdown">--:--:--</div>
+          <div class="text-white/40 text-xs font-display tracking-wider mt-2" data-i18n="countdown_label">倒计时</div>
+
+          <div class="mt-5 pt-4 border-t border-white/10">
+            <div class="text-xs font-display tracking-widest uppercase text-white/40 mb-2" data-i18n="at_time">礼拜时间</div>
+            <div class="font-display text-2xl font-bold" style="color:var(--clr-gold);" id="next-prayer-time">--:--</div>
+          </div>
+        </div>
+
+        <!-- Day Progress Arc -->
+        <div class="info-card text-center">
+          <div class="text-xs font-display tracking-widest uppercase clr-muted mb-3" data-i18n="day_progress">今日进度</div>
+          <div class="day-progress mx-auto">
+            <svg viewBox="0 0 120 120" width="120" height="120">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(46,125,82,0.15)" stroke-width="8"/>
+              <circle id="progress-circle" cx="60" cy="60" r="52" fill="none"
+                stroke="var(--clr-gold)" stroke-width="8"
+                stroke-dasharray="326.56" stroke-dashoffset="326.56"
+                stroke-linecap="round"
+                style="transition: stroke-dashoffset 1s ease;"/>
+            </svg>
+            <div class="progress-text">
+              <div class="font-display font-bold text-xl" style="color:var(--clr-gold);" id="progress-pct">0%</div>
+              <div class="text-xs clr-muted font-display tracking-wide" data-i18n="of_day">今日</div>
+            </div>
+          </div>
+          <div class="mt-3 text-xs clr-muted font-display tracking-wide">
+            <span id="prayers-done">0</span> / <span id="prayers-total">5</span>
+            <span data-i18n="prayers_done"> 次礼拜已过</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ── Row 2: Calendar Strip ───────────────────────────── -->
+    <div class="settings-panel fade-in fade-in-delay-1">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-display text-sm font-bold tracking-widest uppercase clr-muted" data-i18n="select_date">选择日期</h2>
+        <button onclick="goToToday()"
+          class="text-xs font-display font-bold tracking-wider uppercase px-3 py-1.5 rounded-full border transition hover:scale-105"
+          style="border-color:var(--clr-gold);color:var(--clr-gold);" data-i18n="btn_today">今天</button>
+      </div>
+      <div id="calendar-strip" class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+        <!-- JS will populate this -->
+      </div>
+    </div>
+
+
+    <!-- ── Row 3: Prayer Time Cards ────────────────────────── -->
+    <div>
+      <div class="divider-gem fade-in">
+        <span><i class="fa-solid fa-moon"></i></span>
+      </div>
+      <h2 class="font-display text-center text-2xl font-bold tracking-wider mb-2 fade-in" style="color:var(--clr-text);" data-i18n="section_times">今日礼拜时间</h2>
+      <p class="text-center text-sm clr-muted font-serif mb-8 fade-in fade-in-delay-1" id="date-display">---</p>
+
+      <div id="prayer-cards" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <!-- JS will populate this -->
+        <div class="prayer-card skeleton" style="height:180px;"></div>
+        <div class="prayer-card skeleton" style="height:180px;"></div>
+        <div class="prayer-card skeleton" style="height:180px;"></div>
+        <div class="prayer-card skeleton" style="height:180px;"></div>
+        <div class="prayer-card skeleton" style="height:180px;"></div>
+        <div class="prayer-card skeleton" style="height:180px;"></div>
+      </div>
+    </div>
+
+
+    <!-- ── Row 4: Weekly Table + Info ─────────────────────── -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Weekly Table -->
+      <div class="lg:col-span-2 settings-panel fade-in">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="font-display text-sm font-bold tracking-widest uppercase clr-muted" data-i18n="weekly_title">本周礼拜时间</h2>
+          <div class="flex gap-2">
+            <button onclick="prevWeek()" class="w-8 h-8 rounded-full border flex items-center justify-center text-xs transition hover:scale-105" style="border-color:rgba(46,125,82,0.25);color:var(--clr-muted);">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button onclick="nextWeek()" class="w-8 h-8 rounded-full border flex items-center justify-center text-xs transition hover:scale-105" style="border-color:rgba(46,125,82,0.25);color:var(--clr-muted);">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="weekly-table">
+          <!-- Header -->
+          <div class="week-row header-row">
+            <div class="cell date-cell" data-i18n="th_date">日期</div>
+            <div class="cell" data-i18n="th_fajr">晨礼</div>
+            <div class="cell" data-i18n="th_dhuhr">晌礼</div>
+            <div class="cell" data-i18n="th_asr">晡礼</div>
+            <div class="cell" data-i18n="th_maghrib">昏礼</div>
+            <div class="cell" data-i18n="th_isha">宵礼</div>
+            <div class="cell" data-i18n="th_sunrise">日出</div>
+          </div>
+          <div id="weekly-rows">
+            <!-- JS will populate this -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Column -->
+      <div class="flex flex-col gap-4">
+
+        <!-- Qibla Direction -->
+        <div class="info-card fade-in">
+          <div class="divider-gem mb-3">
+            <span><i class="fa-solid fa-compass"></i></span>
+          </div>
+          <h3 class="font-display text-center text-sm font-bold tracking-widest uppercase clr-muted mb-4" data-i18n="qibla_title">朝拜方向 Qibla</h3>
+          <div class="qibla-compass">
+            <div class="compass-ring"></div>
+            <!-- N/S/E/W labels -->
+            <div style="position:absolute;top:6px;left:50%;transform:translateX(-50%);font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;color:var(--clr-muted);">N</div>
+            <div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;color:var(--clr-muted);">S</div>
+            <div style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;color:var(--clr-muted);">W</div>
+            <div style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;color:var(--clr-muted);">E</div>
+            <!-- Needle -->
+            <div class="qibla-needle" id="qibla-needle" style="height:44px;">
+              <div style="width:3px;height:100%;border-radius:2px;background:linear-gradient(to top, var(--clr-gold), transparent);"></div>
+              <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:10px solid var(--clr-gold);position:absolute;top:-10px;left:50%;transform:translateX(-50%);"></div>
+            </div>
+          </div>
+          <div class="text-center mt-4">
+            <div class="font-display font-bold text-2xl" style="color:var(--clr-gold);" id="qibla-degrees">---°</div>
+            <div class="text-xs clr-muted font-display tracking-wide mt-1" data-i18n="from_north">从北顺时针</div>
+          </div>
+        </div>
+
+        <!-- Sun Times -->
+        <div class="info-card fade-in fade-in-delay-1">
+          <h3 class="font-display text-sm font-bold tracking-widest uppercase clr-muted mb-4 text-center" data-i18n="sun_title">日出 / 日落</h3>
+          <div class="flex items-center justify-around">
+            <div class="text-center">
+              <i class="fa-solid fa-sun text-2xl mb-2" style="color:#f59e0b;"></i>
+              <div class="font-display font-bold text-lg" style="color:var(--clr-text);" id="sunrise-time">--:--</div>
+              <div class="text-xs clr-muted font-display tracking-wide" data-i18n="sunrise_label">日出</div>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <div class="w-16 h-px" style="background:linear-gradient(to right, #f59e0b, #e879f9);"></div>
+              <div class="text-xs clr-muted font-display" id="sun-duration">--h --m</div>
+            </div>
+            <div class="text-center">
+              <i class="fa-solid fa-cloud-sun text-2xl mb-2" style="color:#e879f9;"></i>
+              <div class="font-display font-bold text-lg" style="color:var(--clr-text);" id="sunset-time">--:--</div>
+              <div class="text-xs clr-muted font-display tracking-wide" data-i18n="sunset_label">日落</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Location info -->
+        <div class="info-card fade-in fade-in-delay-2">
+          <h3 class="font-display text-sm font-bold tracking-widest uppercase clr-muted mb-4 text-center" data-i18n="loc_title">位置信息</h3>
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-display tracking-wide clr-muted" data-i18n="loc_lat">纬度</span>
+              <span class="font-display text-sm font-semibold" style="color:var(--clr-text);" id="loc-lat">---</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-display tracking-wide clr-muted" data-i18n="loc_lng">经度</span>
+              <span class="font-display text-sm font-semibold" style="color:var(--clr-text);" id="loc-lng">---</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-display tracking-wide clr-muted" data-i18n="loc_tz">时区</span>
+              <span class="font-display text-sm font-semibold" style="color:var(--clr-text);" id="loc-tz">---</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-display tracking-wide clr-muted" data-i18n="loc_method">方法</span>
+              <span class="font-display text-sm font-semibold" style="color:var(--clr-gold);" id="loc-method">MWL</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ── Row 5: Notification Settings ───────────────────── -->
+    <div class="settings-panel fade-in">
+      <div class="divider-gem mb-5">
+        <span><i class="fa-solid fa-bell"></i></span>
+      </div>
+      <h2 class="font-display text-center text-lg font-bold tracking-widest uppercase clr-muted mb-6" data-i18n="notif_title">礼拜提醒 / Prayer Notifications</h2>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4" id="notif-grid">
+        <!-- JS will render this -->
+      </div>
+
+      <p class="text-center text-xs clr-muted font-display tracking-wide mt-5" data-i18n="notif_note">
+        * 提醒功能需要浏览器通知权限 / Browser notification permission required
+      </p>
+    </div>
+
+  </main>
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- FOOTER                                                  -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <footer class="mt-16 py-10 px-6 border-t" style="border-color:rgba(46,125,82,0.2);">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <div class="logo-ring" style="width:40px;height:40px;">
+            <span style="font-family:'Amiri',serif;color:var(--clr-gold);font-size:14px;font-weight:700;">بِسْم</span>
+          </div>
+          <div>
+            <div style="font-family:'Josefin Sans',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.1em;color:var(--clr-text);">AL-FATIHA</div>
+            <div style="font-size:10px;letter-spacing:0.12em;color:var(--clr-muted);font-family:'Josefin Sans',sans-serif;text-transform:uppercase;">S01 Tasbih</div>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-6">
+          <a href="index.html" class="footer-link font-display text-xs tracking-wider uppercase no-underline hover:text-gold-500" data-i18n="footer_home">首页</a>
+          <a href="index.html#features" class="footer-link font-display text-xs tracking-wider uppercase no-underline hover:text-gold-500" data-i18n="nav_features">功能</a>
+          <a href="prayer.html" class="footer-link font-display text-xs tracking-wider uppercase no-underline" style="color:var(--clr-gold);" data-i18n="nav_prayer">祈祷时间</a>
+          <a href="index.html#download" class="footer-link font-display text-xs tracking-wider uppercase no-underline hover:text-gold-500" data-i18n="nav_download">下载</a>
+          <a href="index.html#contact" class="footer-link font-display text-xs tracking-wider uppercase no-underline hover:text-gold-500" data-i18n="nav_contact">联系</a>
+        </div>
+        <div class="text-xs clr-muted font-display tracking-wide text-center">
+          <div>Prayer times powered by <a href="https://praytimes.org" target="_blank" style="color:var(--clr-gold);text-decoration:none;">praytimes.org</a></div>
+          <div class="mt-1">© 2025 AL-FATIHA. All rights reserved.</div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCRIPTS                                                 -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <script src="js/praytime.js"></script>
+  <script>
+    // ─────────────────────────────────────────────────────────
+    //  i18n
+    // ─────────────────────────────────────────────────────────
+    const LANGS = {
+      zh: {
+        nav_features: '功能', nav_how: '使用方法', nav_prayer: '祈祷时间',
+        nav_download: '下载', nav_contact: '联系',
+        hero_title: '祈祷时间', hero_sub: '根据您的地理位置，精准计算每日五次礼拜时间',
+        hijri_label: '伊斯兰历',
+        settings_title: '设置', label_city: '城市 / City',
+        label_method: '计算方法 / Method', label_format: '时间格式 / Format',
+        label_asr: '晡礼方法 / Asr Method', label_highlat: '高纬度方法 / High Lat.',
+        label_region: '常用地区 / Quick Select',
+        next_prayer: '下一次礼拜', countdown_label: '倒计时', at_time: '礼拜时间',
+        day_progress: '今日进度', of_day: '今日', prayers_done: ' 次礼拜已过',
+        select_date: '选择日期', btn_today: '今天',
+        section_times: '今日礼拜时间',
+        weekly_title: '本周礼拜时间',
+        th_date: '日期', th_fajr: '晨礼', th_dhuhr: '晌礼', th_asr: '晡礼',
+        th_maghrib: '昏礼', th_isha: '宵礼', th_sunrise: '日出',
+        qibla_title: '朝拜方向 Qibla', from_north: '从北顺时针',
+        sun_title: '日出 / 日落', sunrise_label: '日出', sunset_label: '日落',
+        loc_title: '位置信息', loc_lat: '纬度', loc_lng: '经度', loc_tz: '时区', loc_method: '方法',
+        notif_title: '礼拜提醒', notif_note: '* 提醒功能需要浏览器通知权限',
+        footer_home: '首页',
+        prayers: ['晨礼', '日出', '晌礼', '晡礼', '日落', '昏礼', '宵礼', '午夜'],
+        days: ['周日','周一','周二','周三','周四','周五','周六'],
+      },
+      en: {
+        nav_features: 'Features', nav_how: 'How to Use', nav_prayer: 'Prayer Times',
+        nav_download: 'Download', nav_contact: 'Contact',
+        hero_title: 'Prayer Times', hero_sub: 'Accurate daily prayer times based on your location',
+        hijri_label: 'Islamic Calendar',
+        settings_title: 'Settings', label_city: 'City',
+        label_method: 'Calculation Method', label_format: 'Time Format',
+        label_asr: 'Asr Method', label_highlat: 'High Lat. Adjustment',
+        label_region: 'Quick Select',
+        next_prayer: 'Next Prayer', countdown_label: 'Countdown', at_time: 'Prayer Time',
+        day_progress: 'Day Progress', of_day: 'Today', prayers_done: ' prayers passed',
+        select_date: 'Select Date', btn_today: 'Today',
+        section_times: "Today's Prayer Times",
+        weekly_title: 'Weekly Prayer Times',
+        th_date: 'Date', th_fajr: 'Fajr', th_dhuhr: 'Dhuhr', th_asr: 'Asr',
+        th_maghrib: 'Maghrib', th_isha: 'Isha', th_sunrise: 'Sunrise',
+        qibla_title: 'Qibla Direction', from_north: 'Clockwise from North',
+        sun_title: 'Sunrise / Sunset', sunrise_label: 'Sunrise', sunset_label: 'Sunset',
+        loc_title: 'Location Info', loc_lat: 'Latitude', loc_lng: 'Longitude', loc_tz: 'Timezone', loc_method: 'Method',
+        notif_title: 'Prayer Notifications', notif_note: '* Browser notification permission required',
+        footer_home: 'Home',
+        prayers: ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Sunset', 'Maghrib', 'Isha', 'Midnight'],
+        days: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+      },
+      ar: {
+        nav_features: 'الميزات', nav_how: 'طريقة الاستخدام', nav_prayer: 'أوقات الصلاة',
+        nav_download: 'تحميل', nav_contact: 'اتصل',
+        hero_title: 'أوقات الصلاة', hero_sub: 'أوقات الصلاة الدقيقة بناءً على موقعك',
+        hijri_label: 'التقويم الهجري',
+        settings_title: 'الإعدادات', label_city: 'المدينة',
+        label_method: 'طريقة الحساب', label_format: 'تنسيق الوقت',
+        label_asr: 'طريقة العصر', label_highlat: 'العروض العالية',
+        label_region: 'اختيار سريع',
+        next_prayer: 'الصلاة القادمة', countdown_label: 'العد التنازلي', at_time: 'وقت الصلاة',
+        day_progress: 'تقدم اليوم', of_day: 'اليوم', prayers_done: ' صلوات مضت',
+        select_date: 'اختر التاريخ', btn_today: 'اليوم',
+        section_times: 'أوقات الصلاة اليوم',
+        weekly_title: 'أوقات الصلاة الأسبوعية',
+        th_date: 'التاريخ', th_fajr: 'الفجر', th_dhuhr: 'الظهر', th_asr: 'العصر',
+        th_maghrib: 'المغرب', th_isha: 'العشاء', th_sunrise: 'الشروق',
+        qibla_title: 'اتجاه القبلة', from_north: 'عكس اتجاه عقارب الساعة من الشمال',
+        sun_title: 'الشروق / الغروب', sunrise_label: 'الشروق', sunset_label: 'الغروب',
+        loc_title: 'معلومات الموقع', loc_lat: 'خط العرض', loc_lng: 'خط الطول', loc_tz: 'المنطقة الزمنية', loc_method: 'الطريقة',
+        notif_title: 'تنبيهات الصلاة', notif_note: '* يتطلب إذن إشعارات المتصفح',
+        footer_home: 'الرئيسية',
+        prayers: ['الفجر', 'الشروق', 'الظهر', 'العصر', 'الغروب', 'المغرب', 'العشاء', 'منتصف الليل'],
+        days: ['أح','إث','ثل','أر','خم','جم','سب'],
+      },
+      ms: {
+        nav_features: 'Ciri', nav_how: 'Cara Guna', nav_prayer: 'Waktu Solat',
+        nav_download: 'Muat Turun', nav_contact: 'Hubungi',
+        hero_title: 'Waktu Solat', hero_sub: 'Waktu solat harian yang tepat berdasarkan lokasi anda',
+        hijri_label: 'Kalendar Islam',
+        settings_title: 'Tetapan', label_city: 'Bandar',
+        label_method: 'Kaedah Pengiraan', label_format: 'Format Masa',
+        label_asr: 'Kaedah Asar', label_highlat: 'Latitud Tinggi',
+        label_region: 'Pilihan Cepat',
+        next_prayer: 'Solat Seterusnya', countdown_label: 'Kiraan Undur', at_time: 'Waktu Solat',
+        day_progress: 'Kemajuan Hari', of_day: 'Hari ini', prayers_done: ' solat telah berlalu',
+        select_date: 'Pilih Tarikh', btn_today: 'Hari Ini',
+        section_times: 'Waktu Solat Hari Ini',
+        weekly_title: 'Waktu Solat Mingguan',
+        th_date: 'Tarikh', th_fajr: 'Subuh', th_dhuhr: 'Zuhur', th_asr: 'Asar',
+        th_maghrib: 'Maghrib', th_isha: 'Isyak', th_sunrise: 'Syuruk',
+        qibla_title: 'Arah Kiblat', from_north: 'Ikut jam dari Utara',
+        sun_title: 'Syuruk / Matahari Terbenam', sunrise_label: 'Syuruk', sunset_label: 'Terbenam',
+        loc_title: 'Maklumat Lokasi', loc_lat: 'Latitud', loc_lng: 'Longitud', loc_tz: 'Zon Waktu', loc_method: 'Kaedah',
+        notif_title: 'Peringatan Solat', notif_note: '* Memerlukan kebenaran pemberitahuan pelayar',
+        footer_home: 'Utama',
+        prayers: ['Subuh', 'Syuruk', 'Zuhur', 'Asar', 'Matahari Terbenam', 'Maghrib', 'Isyak', 'Tengah Malam'],
+        days: ['Ahd','Isn','Sel','Rab','Kha','Jum','Sab'],
+      }
+    };
+
+    let currentLang = 'zh';
+
+    function t(key) {
+      return (LANGS[currentLang] || LANGS.zh)[key] || (LANGS.zh)[key] || key;
+    }
+
+    function applyI18n() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (LANGS[currentLang][key]) el.textContent = LANGS[currentLang][key];
+      });
+      // re-render dynamic content
+      renderPrayerCards();
+      renderWeeklyTable();
+      renderNotifGrid();
+      renderCalendarStrip();
+    }
+
+    function setLang(lang) {
+      currentLang = lang;
+      document.getElementById('lang-label').textContent =
+        {zh:'中文', en:'English', ar:'العربية', ms:'Bahasa'}[lang];
+      document.querySelectorAll('.lang-dropdown-menu a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('data-lang') === lang);
+      });
+      // RTL for Arabic
+      document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+      toggleLang(); // close dropdown
+      applyI18n();
+    }
+
+    function toggleLang() {
+      document.getElementById('lang-dropdown').classList.toggle('open');
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Theme
+    // ─────────────────────────────────────────────────────────
+    let isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    function applyTheme() {
+      document.documentElement.classList.toggle('dark', isDark);
+      const icon = document.getElementById('theme-icon');
+      icon.className = isDark ? 'fa-solid fa-sun text-yellow-400' : 'fa-solid fa-moon text-white/80';
+    }
+
+    document.getElementById('theme-btn').addEventListener('click', () => {
+      isDark = !isDark;
+      applyTheme();
+    });
+
+    applyTheme();
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Navbar scroll
+    // ─────────────────────────────────────────────────────────
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 60);
+    });
+
+    // Close dropdowns on outside click
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#lang-dropdown')) {
+        document.getElementById('lang-dropdown').classList.remove('open');
+      }
+      if (!e.target.closest('#city-search-wrapper')) {
+        document.getElementById('search-results').style.display = 'none';
+      }
+    });
+
+    function toggleMobileMenu() {
+      document.getElementById('mobile-menu').classList.toggle('open');
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  State
+    // ─────────────────────────────────────────────────────────
+    const state = {
+      lat: 21.3891,
+      lng: 39.8579,
+      timezone: 'Asia/Riyadh',
+      city: 'Makkah',
+      method: 'MWL',
+      format: '24h',
+      asr: 'Standard',
+      highLats: 'NightMiddle',
+      selectedDate: new Date(),
+      weekOffset: 0,
+      notifications: { fajr: false, dhuhr: false, asr: false, maghrib: false, isha: false },
+    };
+
+    // Prayer definitions
+    const PRAYERS = [
+      { key: 'fajr',    icon: 'fa-star-and-crescent', arabicNames: { zh: 'الفجر', en: 'الفجر', ar: 'الفجر', ms: 'الفجر' } },
+      { key: 'sunrise', icon: 'fa-sun',               arabicNames: { zh: 'الشروق', en: 'الشروق', ar: 'الشروق', ms: 'الشروق' } },
+      { key: 'dhuhr',   icon: 'fa-circle-dot',        arabicNames: { zh: 'الظهر', en: 'الظهر', ar: 'الظهر', ms: 'الظهر' } },
+      { key: 'asr',     icon: 'fa-cloud-sun',         arabicNames: { zh: 'العصر', en: 'العصر', ar: 'العصر', ms: 'العصر' } },
+      { key: 'maghrib', icon: 'fa-moon',              arabicNames: { zh: 'المغرب', en: 'المغرب', ar: 'المغرب', ms: 'المغرب' } },
+      { key: 'isha',    icon: 'fa-star',              arabicNames: { zh: 'العشاء', en: 'العشاء', ar: 'العشاء', ms: 'العشاء' } },
+    ];
+
+    const PRAYER_NAMES_MAP = {
+      zh: { fajr:'晨礼', sunrise:'日出', dhuhr:'晌礼', asr:'晡礼', sunset:'日落', maghrib:'昏礼', isha:'宵礼', midnight:'午夜' },
+      en: { fajr:'Fajr', sunrise:'Sunrise', dhuhr:'Dhuhr', asr:'Asr', sunset:'Sunset', maghrib:'Maghrib', isha:'Isha', midnight:'Midnight' },
+      ar: { fajr:'الفجر', sunrise:'الشروق', dhuhr:'الظهر', asr:'العصر', sunset:'الغروب', maghrib:'المغرب', isha:'العشاء', midnight:'منتصف الليل' },
+      ms: { fajr:'Subuh', sunrise:'Syuruk', dhuhr:'Zuhur', asr:'Asar', sunset:'Terbenam', maghrib:'Maghrib', isha:'Isyak', midnight:'Tengah Malam' },
+    };
+
+    // ─────────────────────────────────────────────────────────
+    //  praytime instance
+    // ─────────────────────────────────────────────────────────
+    let pt = new PrayTime(state.method);
+
+    function getPrayerTimes(date) {
+      pt.method(state.method);
+      pt.location([state.lat, state.lng]);
+      pt.timezone(state.timezone);
+      pt.format(state.format);
+      pt.adjust({ asr: state.asr, highLats: state.highLats });
+      return pt.times(date);
+    }
+
+    // ─────────────────────────────────────────────────────────
+    //  City Search (built-in city database)
+    // ─────────────────────────────────────────────────────────
+    const CITIES = [
+      { name: 'Makkah', country: 'Saudi Arabia', lat: 21.3891, lng: 39.8579, tz: 'Asia/Riyadh' },
+      { name: 'Madinah', country: 'Saudi Arabia', lat: 24.4686, lng: 39.6142, tz: 'Asia/Riyadh' },
+      { name: 'Riyadh', country: 'Saudi Arabia', lat: 24.7136, lng: 46.6753, tz: 'Asia/Riyadh' },
+      { name: 'Jeddah', country: 'Saudi Arabia', lat: 21.5433, lng: 39.1728, tz: 'Asia/Riyadh' },
+      { name: 'Dubai', country: 'UAE', lat: 25.2048, lng: 55.2708, tz: 'Asia/Dubai' },
+      { name: 'Abu Dhabi', country: 'UAE', lat: 24.4539, lng: 54.3773, tz: 'Asia/Dubai' },
+      { name: 'Cairo', country: 'Egypt', lat: 30.0444, lng: 31.2357, tz: 'Africa/Cairo' },
+      { name: 'Alexandria', country: 'Egypt', lat: 31.2001, lng: 29.9187, tz: 'Africa/Cairo' },
+      { name: 'Istanbul', country: 'Turkey', lat: 41.0082, lng: 28.9784, tz: 'Europe/Istanbul' },
+      { name: 'Ankara', country: 'Turkey', lat: 39.9334, lng: 32.8597, tz: 'Europe/Istanbul' },
+      { name: 'Tehran', country: 'Iran', lat: 35.6892, lng: 51.3890, tz: 'Asia/Tehran' },
+      { name: 'Baghdad', country: 'Iraq', lat: 33.3152, lng: 44.3661, tz: 'Asia/Baghdad' },
+      { name: 'Karachi', country: 'Pakistan', lat: 24.8607, lng: 67.0011, tz: 'Asia/Karachi' },
+      { name: 'Lahore', country: 'Pakistan', lat: 31.5204, lng: 74.3587, tz: 'Asia/Karachi' },
+      { name: 'Islamabad', country: 'Pakistan', lat: 33.7294, lng: 73.0931, tz: 'Asia/Karachi' },
+      { name: 'Dhaka', country: 'Bangladesh', lat: 23.8103, lng: 90.4125, tz: 'Asia/Dhaka' },
+      { name: 'Mumbai', country: 'India', lat: 19.0760, lng: 72.8777, tz: 'Asia/Kolkata' },
+      { name: 'Delhi', country: 'India', lat: 28.7041, lng: 77.1025, tz: 'Asia/Kolkata' },
+      { name: 'Kuala Lumpur', country: 'Malaysia', lat: 3.1390, lng: 101.6869, tz: 'Asia/Kuala_Lumpur' },
+      { name: 'Jakarta', country: 'Indonesia', lat: -6.2088, lng: 106.8456, tz: 'Asia/Jakarta' },
+      { name: 'Singapore', country: 'Singapore', lat: 1.3521, lng: 103.8198, tz: 'Asia/Singapore' },
+      { name: 'London', country: 'UK', lat: 51.5074, lng: -0.1278, tz: 'Europe/London' },
+      { name: 'Paris', country: 'France', lat: 48.8566, lng: 2.3522, tz: 'Europe/Paris' },
+      { name: 'Berlin', country: 'Germany', lat: 52.5200, lng: 13.4050, tz: 'Europe/Berlin' },
+      { name: 'Amsterdam', country: 'Netherlands', lat: 52.3676, lng: 4.9041, tz: 'Europe/Amsterdam' },
+      { name: 'Moscow', country: 'Russia', lat: 55.7558, lng: 37.6173, tz: 'Europe/Moscow' },
+      { name: 'New York', country: 'USA', lat: 40.7128, lng: -74.0060, tz: 'America/New_York' },
+      { name: 'Los Angeles', country: 'USA', lat: 34.0522, lng: -118.2437, tz: 'America/Los_Angeles' },
+      { name: 'Chicago', country: 'USA', lat: 41.8781, lng: -87.6298, tz: 'America/Chicago' },
+      { name: 'Toronto', country: 'Canada', lat: 43.6510, lng: -79.3470, tz: 'America/Toronto' },
+      { name: 'Beijing', country: 'China', lat: 39.9042, lng: 116.4074, tz: 'Asia/Shanghai' },
+      { name: 'Shanghai', country: 'China', lat: 31.2304, lng: 121.4737, tz: 'Asia/Shanghai' },
+      { name: 'Guangzhou', country: 'China', lat: 23.1291, lng: 113.2644, tz: 'Asia/Shanghai' },
+      { name: 'Urumqi', country: 'China', lat: 43.8256, lng: 87.6168, tz: 'Asia/Urumqi' },
+      { name: 'Nairobi', country: 'Kenya', lat: -1.2921, lng: 36.8219, tz: 'Africa/Nairobi' },
+      { name: 'Lagos', country: 'Nigeria', lat: 6.5244, lng: 3.3792, tz: 'Africa/Lagos' },
+      { name: 'Casablanca', country: 'Morocco', lat: 33.5731, lng: -7.5898, tz: 'Africa/Casablanca' },
+      { name: 'Sydney', country: 'Australia', lat: -33.8688, lng: 151.2093, tz: 'Australia/Sydney' },
+      { name: 'Melbourne', country: 'Australia', lat: -37.8136, lng: 144.9631, tz: 'Australia/Melbourne' },
+    ];
+
+    function onCityInput() {
+      const q = document.getElementById('city-input').value.trim().toLowerCase();
+      if (!q) { document.getElementById('search-results').style.display = 'none'; return; }
+      const results = CITIES.filter(c =>
+        c.name.toLowerCase().includes(q) || c.country.toLowerCase().includes(q)
+      ).slice(0, 8);
+      renderSearchResults(results);
+    }
+
+    function onCityFocus() {
+      const q = document.getElementById('city-input').value.trim().toLowerCase();
+      if (q) onCityInput();
+    }
+
+    function renderSearchResults(results) {
+      const el = document.getElementById('search-results');
+      if (!results.length) { el.style.display = 'none'; return; }
+      el.innerHTML = results.map(c => `
+        <div class="search-result-item" onclick="selectCity('${c.name}', ${c.lat}, ${c.lng}, '${c.tz}')">
+          <i class="fa-solid fa-location-dot mr-2" style="color:var(--clr-gold);"></i>
+          ${c.name}
+          <span class="city-country ml-2">${c.country}</span>
+        </div>
+      `).join('');
+      el.style.display = 'block';
+    }
+
+    function selectCity(name, lat, lng, tz) {
+      state.lat = lat;
+      state.lng = lng;
+      state.timezone = tz;
+      state.city = name;
+      document.getElementById('city-input').value = name;
+      document.getElementById('search-results').style.display = 'none';
+      document.getElementById('location-text').textContent = `${name} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+      updateAll();
+    }
+
+    function quickCity(name, lat, lng, tz) {
+      selectCity(name, lat, lng, tz);
+      document.getElementById('city-input').value = name;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    //  GPS Location
+    // ─────────────────────────────────────────────────────────
+    function detectLocation() {
+      if (!navigator.geolocation) return;
+      const btn = document.querySelector('[onclick="detectLocation()"]');
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="color:var(--clr-gold);"></i>';
+
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          state.lat = pos.coords.latitude;
+          state.lng = pos.coords.longitude;
+          state.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          state.city = `${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`;
+          document.getElementById('city-input').value = `GPS: ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`;
+          document.getElementById('location-text').textContent = `GPS (${state.lat.toFixed(4)}, ${state.lng.toFixed(4)})`;
+          if (btn) btn.innerHTML = '<i class="fa-solid fa-location-crosshairs" style="color:var(--clr-gold);"></i>';
+          updateAll();
+        },
+        () => {
+          if (btn) btn.innerHTML = '<i class="fa-solid fa-location-crosshairs" style="color:var(--clr-gold);"></i>';
+          alert('无法获取位置 / Could not get location');
+        }
+      );
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Settings handlers
+    // ─────────────────────────────────────────────────────────
+    function onMethodChange() {
+      state.method = document.getElementById('method-select').value;
+      document.getElementById('loc-method').textContent = state.method;
+      updateAll();
+    }
+
+    function onFormatChange() {
+      state.format = document.getElementById('format-select').value;
+      updateAll();
+    }
+
+    function onAsrChange() {
+      state.asr = document.getElementById('asr-select').value;
+      updateAll();
+    }
+
+    function onHighLatChange() {
+      state.highLats = document.getElementById('highlat-select').value;
+      updateAll();
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Core render
+    // ─────────────────────────────────────────────────────────
+    let currentTimes = {};
+
+    function updateAll() {
+      currentTimes = getPrayerTimes(state.selectedDate);
+      renderPrayerCards();
+      renderWeeklyTable();
+      updateSunTimes();
+      updateLocationInfo();
+      updateQibla();
+      updateDayProgress();
+      updateDateDisplay();
+    }
+
+    // ─────────────────────────────────────────────────────────
+    //  Prayer Cards
+    // ─────────────────────────────────────────────────────────
+    function getActivePrayer(times) {
+      const now = Date.now();
+      // Build timestamp array for main 5 prayers
+      const keys = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+      let active = null;
+      for (let i = 0; i < keys.length; i++) {
+        const t = times[keys[i]];
+        const next = times[keys[i + 1]];
+        if (t && now >= t && (!next || now < next)) {
+          active = keys[i];
+        }
+      }
+      // Check if still in fajr -> sunrise window
+      if (!active && times.fajr && times.sunrise && now >= times.fajr && now < times.sunrise) {
+        active = 'fajr';
+      }
+      return active;
+    }
+
+    function renderPrayerCards() {
+      const times = currentTimes;
+      const active = getActivePrayer(times);
+      const nameMap = PRAYER_NAMES_MAP[currentLang] || PRAYER_NAMES_MAP.zh;
+      const isToday = isSameDay(state.selectedDate, new Date());
+
+      const container = document.getElementById('prayer-cards');
+      container.innerHTML = PRAYERS.map(p => {
+        const rawTime = times[p.key];
+        const timeStr = formatTimestamp(rawTime);
+        const isActive = isToday && active === p.key;
+        return `
+          <div class="prayer-card fade-in ${isActive ? 'active-prayer' : ''}">
+            <span class="prayer-badge" data-i18n_inner="now_badge">NOW</span>
+            <div class="prayer-icon">
+              <i class="fa-solid ${p.icon}"></i>
+            </div>
+            <div class="prayer-name">${nameMap[p.key] || p.key}</div>
+            <div class="prayer-arabic">${p.arabicNames[currentLang] || p.arabicNames.zh}</div>
+            <div class="prayer-time">${timeStr}</div>
+          </div>
+        `;
+      }).join('');
+
+      // Re-run fade-in
+      setTimeout(() => {
+        container.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+      }, 30);
+    }
+
+    // ─────────────────────────────────────────────────────────
+    //  Format timestamp
+    // ─────────────────────────────────────────────────────────
+    function formatTimestamp(ts) {
+      if (!ts || isNaN(ts)) return '-----';
+      const d = new Date(ts);
+      try {
+        return d.toLocaleTimeString('en-US', {
+          timeZone: state.timezone,
+          hour12: state.format === '12h',
+          hour: state.format === '24h' ? '2-digit' : 'numeric',
+          minute: '2-digit',
+        });
+      } catch (e) {
+        return d.toLocaleTimeString('en-US', {
+          hour12: state.format === '12h',
+          hour: state.format === '24h' ? '2-digit' : 'numeric',
+          minute: '2-digit',
+        });
+      }
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Weekly Table
+    // ─────────────────────────────────────────────────────────
+    let weekStart = getWeekStart(new Date());
+
+    function getWeekStart(d) {
+      const day = new Date(d);
+      day.setDate(day.getDate() - day.getDay()); // Sunday
+      day.setHours(0,0,0,0);
+      return day;
+    }
+
+    function prevWeek() {
+      weekStart = new Date(weekStart);
+      weekStart.setDate(weekStart.getDate() - 7);
+      renderWeeklyTable();
+    }
+
+    function nextWeek() {
+      weekStart = new Date(weekStart);
+      weekStart.setDate(weekStart.getDate() + 7);
+      renderWeeklyTable();
+    }
+
+    function renderWeeklyTable() {
+      const nameMap = PRAYER_NAMES_MAP[currentLang] || PRAYER_NAMES_MAP.zh;
+      const days = LANGS[currentLang]?.days || LANGS.zh.days;
+      const rows = document.getElementById('weekly-rows');
+      const today = new Date(); today.setHours(0,0,0,0);
+      let html = '';
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(weekStart);
+        d.setDate(d.getDate() + i);
+        const isToday = d.getTime() === today.getTime();
+        const t = getPrayerTimes(d);
+
+        const fmt = (ts) => {
+          if (!ts || isNaN(ts)) return '-----';
+          const date = new Date(ts);
+          try {
+            return date.toLocaleTimeString('en-US', {
+              timeZone: state.timezone,
+              hour12: state.format === '12h',
+              hour: state.format === '24h' ? '2-digit' : 'numeric',
+              minute: '2-digit',
+            });
+          } catch {
+            return date.toLocaleTimeString('en-US', {
+              hour12: false, hour: '2-digit', minute: '2-digit'
+            });
+          }
+        };
+
+        html += `
+          <div class="week-row ${isToday ? 'today-row' : ''}" onclick="selectDateFromWeek(${d.getTime()})">
+            <div class="cell date-cell">${days[d.getDay()]} ${d.getDate()}</div>
+            <div class="cell time-cell">${fmt(t.fajr)}</div>
+            <div class="cell time-cell">${fmt(t.dhuhr)}</div>
+            <div class="cell time-cell">${fmt(t.asr)}</div>
+            <div class="cell time-cell">${fmt(t.maghrib)}</div>
+            <div class="cell time-cell">${fmt(t.isha)}</div>
+            <div class="cell time-cell">${fmt(t.sunrise)}</div>
+          </div>
+        `;
+      }
+      rows.innerHTML = html;
+
+      // Update header i18n
+      const headers = document.querySelectorAll('#weekly-table .header-row .cell');
+      const hKeys = ['th_date','th_fajr','th_dhuhr','th_asr','th_maghrib','th_isha','th_sunrise'];
+      headers.forEach((h, i) => { if (LANGS[currentLang][hKeys[i]]) h.textContent = LANGS[currentLang][hKeys[i]]; });
+    }
+
+    function selectDateFromWeek(ts) {
+      state.selectedDate = new Date(ts);
+      updateAll();
+      renderCalendarStrip();
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Calendar Strip
+    // ─────────────────────────────────────────────────────────
+    function renderCalendarStrip() {
+      const strip = document.getElementById('calendar-strip');
+      const days = LANGS[currentLang]?.days || LANGS.zh.days;
+      const today = new Date(); today.setHours(0,0,0,0);
+      let html = '';
+
+      for (let i = -3; i <= 10; i++) {
+        const d = new Date(today);
+        d.setDate(d.getDate() + i);
+        const isToday = i === 0;
+        const isSel = isSameDay(d, state.selectedDate);
+        html += `
+          <div class="cal-day ${isSel ? 'active' : ''}" onclick="selectCalDay(${d.getTime()})">
+            <div class="cal-day-name">${days[d.getDay()]}</div>
+            <div class="cal-day-num">${d.getDate()}</div>
+            <div class="cal-day-dot"></div>
+          </div>
+        `;
+      }
+      strip.innerHTML = html;
+
+      // Scroll active into view
+      setTimeout(() => {
+        const active = strip.querySelector('.cal-day.active');
+        if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }, 50);
+    }
+
+    function selectCalDay(ts) {
+      state.selectedDate = new Date(ts);
+      renderCalendarStrip();
+      updateAll();
+    }
+
+    function goToToday() {
+      state.selectedDate = new Date();
+      renderCalendarStrip();
+      updateAll();
+    }
+
+    function isSameDay(a, b) {
+      return a.getFullYear() === b.getFullYear() &&
+             a.getMonth() === b.getMonth() &&
+             a.getDate() === b.getDate();
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Sun Times
+    // ─────────────────────────────────────────────────────────
+    function updateSunTimes() {
+      const t = currentTimes;
+      document.getElementById('sunrise-time').textContent = formatTimestamp(t.sunrise);
+      document.getElementById('sunset-time').textContent = formatTimestamp(t.sunset);
+
+      if (t.sunrise && t.sunset && !isNaN(t.sunrise) && !isNaN(t.sunset)) {
+        const durMs = t.sunset - t.sunrise;
+        const h = Math.floor(durMs / 36e5);
+        const m = Math.floor((durMs % 36e5) / 6e4);
+        document.getElementById('sun-duration').textContent = `${h}h ${m}m`;
+      }
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Location Info
+    // ─────────────────────────────────────────────────────────
+    function updateLocationInfo() {
+      document.getElementById('loc-lat').textContent = state.lat.toFixed(4) + '°';
+      document.getElementById('loc-lng').textContent = state.lng.toFixed(4) + '°';
+      document.getElementById('loc-tz').textContent = state.timezone.split('/').pop().replace('_', ' ');
+      document.getElementById('loc-method').textContent = state.method;
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Qibla Direction
+    // ─────────────────────────────────────────────────────────
+    function updateQibla() {
+      // Kaaba coordinates
+      const kLat = 21.4225, kLng = 39.8262;
+      const lat1 = state.lat * Math.PI / 180;
+      const lat2 = kLat * Math.PI / 180;
+      const dLng = (kLng - state.lng) * Math.PI / 180;
+
+      const y = Math.sin(dLng) * Math.cos(lat2);
+      const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+      let bearing = Math.atan2(y, x) * 180 / Math.PI;
+      bearing = (bearing + 360) % 360;
+
+      document.getElementById('qibla-degrees').textContent = `${bearing.toFixed(1)}°`;
+      document.getElementById('qibla-needle').style.transform =
+        `translateX(-50%) rotate(${bearing}deg)`;
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Day Progress
+    // ─────────────────────────────────────────────────────────
+    function updateDayProgress() {
+      const now = Date.now();
+      const startOfDay = new Date(); startOfDay.setHours(0,0,0,0);
+      const endOfDay = new Date(); endOfDay.setHours(23,59,59,999);
+      const pct = (now - startOfDay.getTime()) / (endOfDay.getTime() - startOfDay.getTime());
+
+      const circumference = 326.56;
+      const offset = circumference * (1 - pct);
+      document.getElementById('progress-circle').style.strokeDashoffset = offset;
+      document.getElementById('progress-pct').textContent = `${Math.round(pct * 100)}%`;
+
+      // Count passed prayers
+      const mainPrayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+      const passed = mainPrayers.filter(k => currentTimes[k] && now > currentTimes[k]).length;
+      document.getElementById('prayers-done').textContent = passed;
+      document.getElementById('prayers-total').textContent = mainPrayers.length;
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Date Display
+    // ─────────────────────────────────────────────────────────
+    function updateDateDisplay() {
+      const d = state.selectedDate;
+      const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const locale = { zh: 'zh-CN', en: 'en-US', ar: 'ar', ms: 'ms-MY' }[currentLang] || 'zh-CN';
+      document.getElementById('date-display').textContent = d.toLocaleDateString(locale, opts);
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Hijri Date
+    // ─────────────────────────────────────────────────────────
+    function updateHijriDate() {
+      try {
+        const d = new Date();
+        const hijri = d.toLocaleDateString('ar-SA-u-ca-islamic', {
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+        document.getElementById('hijri-date').textContent = hijri;
+      } catch (e) {
+        document.getElementById('hijri-date').textContent = '---';
+      }
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Live Clock
+    // ─────────────────────────────────────────────────────────
+    function updateClock() {
+      const now = new Date();
+      const locale = { zh: 'zh-CN', en: 'en-US', ar: 'ar', ms: 'ms-MY' }[currentLang] || 'zh-CN';
+
+      document.getElementById('live-clock').textContent =
+        now.toLocaleTimeString('en-US', {
+          timeZone: state.timezone,
+          hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+
+      document.getElementById('live-date').textContent =
+        now.toLocaleDateString(locale, {
+          timeZone: state.timezone,
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Next Prayer Countdown
+    // ─────────────────────────────────────────────────────────
+    function updateCountdown() {
+      const now = Date.now();
+      const mainKeys = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+      const nameMap = PRAYER_NAMES_MAP[currentLang] || PRAYER_NAMES_MAP.zh;
+      const ARABIC_NAMES = { fajr:'الفجر', dhuhr:'الظهر', asr:'العصر', maghrib:'المغرب', isha:'العشاء' };
+
+      // Get today's times (always today for countdown)
+      const todayTimes = getPrayerTimes(new Date());
+
+      let nextKey = null, nextTs = null;
+      for (const k of mainKeys) {
+        const ts = todayTimes[k];
+        if (ts && ts > now) {
+          nextKey = k; nextTs = ts; break;
+        }
+      }
+
+      // If all passed, get next day's fajr
+      if (!nextKey) {
+        const tom = new Date(); tom.setDate(tom.getDate() + 1);
+        const tomTimes = getPrayerTimes(tom);
+        nextKey = 'fajr'; nextTs = tomTimes.fajr;
+      }
+
+      if (nextKey && nextTs) {
+        const diff = nextTs - now;
+        const h = Math.floor(diff / 36e5);
+        const m = Math.floor((diff % 36e5) / 6e4);
+        const s = Math.floor((diff % 6e4) / 1000);
+        const pad = n => String(n).padStart(2, '0');
+        document.getElementById('countdown').textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+        document.getElementById('next-prayer-name').textContent = nameMap[nextKey] || nextKey;
+        document.getElementById('next-prayer-arabic').textContent = ARABIC_NAMES[nextKey] || '';
+        document.getElementById('next-prayer-time').textContent = formatTimestamp(nextTs);
+      }
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Notification Grid
+    // ─────────────────────────────────────────────────────────
+    function renderNotifGrid() {
+      const nameMap = PRAYER_NAMES_MAP[currentLang] || PRAYER_NAMES_MAP.zh;
+      const PRAYER_ICONS = { fajr:'fa-star-and-crescent', dhuhr:'fa-circle-dot', asr:'fa-cloud-sun', maghrib:'fa-moon', isha:'fa-star' };
+      const keys = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+
+      document.getElementById('notif-grid').innerHTML = keys.map(k => `
+        <div class="info-card text-center" style="padding:16px 12px;">
+          <i class="fa-solid ${PRAYER_ICONS[k]} text-2xl mb-3" style="color:var(--clr-gold);"></i>
+          <div class="font-display text-xs font-bold tracking-wider uppercase clr-muted mb-3">${nameMap[k] || k}</div>
+          <button class="notif-toggle ${state.notifications[k] ? 'on' : ''}"
+            onclick="toggleNotif('${k}')"
+            id="notif-toggle-${k}"
+            aria-label="Toggle ${k} notification">
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function toggleNotif(key) {
+      if (!('Notification' in window)) {
+        alert('Your browser does not support notifications.');
+        return;
+      }
+      Notification.requestPermission().then(perm => {
+        if (perm === 'granted') {
+          state.notifications[key] = !state.notifications[key];
+          document.getElementById(`notif-toggle-${key}`).classList.toggle('on', state.notifications[key]);
+        } else {
+          alert('通知权限被拒绝 / Notification permission denied.');
+        }
+      });
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Fade-in observer
+    // ─────────────────────────────────────────────────────────
+    function initFadeIn() {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+      }, { threshold: 0.1 });
+      document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Notification check (fire if time matches)
+    // ─────────────────────────────────────────────────────────
+    let lastNotifFired = {};
+
+    function checkNotifications() {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      const nameMap = PRAYER_NAMES_MAP[currentLang] || PRAYER_NAMES_MAP.zh;
+      const now = Date.now();
+      const todayTimes = getPrayerTimes(new Date());
+
+      Object.keys(state.notifications).forEach(k => {
+        if (!state.notifications[k]) return;
+        const ts = todayTimes[k];
+        if (!ts || isNaN(ts)) return;
+        const diff = Math.abs(now - ts);
+        const fireKey = `${k}-${new Date(ts).toDateString()}`;
+        if (diff < 30000 && !lastNotifFired[fireKey]) {
+          lastNotifFired[fireKey] = true;
+          new Notification(`🕌 ${nameMap[k]}`, {
+            body: `${nameMap[k]} ${formatTimestamp(ts)}`,
+            icon: 'img/icon.png',
+            tag: k,
+          });
+        }
+      });
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    //  Init
+    // ─────────────────────────────────────────────────────────
+    function init() {
+      // Set default city (Makkah)
+      document.getElementById('city-input').value = 'Makkah';
+      document.getElementById('location-text').textContent = 'Makkah (21.3891, 39.8579)';
+
+      updateHijriDate();
+      updateAll();
+      renderCalendarStrip();
+      renderNotifGrid();
+      initFadeIn();
+
+      // Tick every second
+      setInterval(() => {
+        updateClock();
+        updateCountdown();
+        updateDayProgress();
+        checkNotifications();
+      }, 1000);
+
+      // Refresh prayer times every minute
+      setInterval(() => {
+        if (isSameDay(state.selectedDate, new Date())) {
+          currentTimes = getPrayerTimes(state.selectedDate);
+          renderPrayerCards();
+        }
+      }, 60000);
+
+      updateClock();
+      updateCountdown();
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
