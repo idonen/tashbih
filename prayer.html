@@ -111,7 +111,41 @@
     .nav-link { transition: color 0.2s, opacity 0.2s; }
     #navbar.scrolled .nav-link { color: var(--clr-muted); }
     #navbar.scrolled .nav-link:hover { color: var(--clr-text); }
+    .logo-text { color: #fff; transition: color 0.35s; }
+    #navbar.scrolled .logo-text { color: var(--clr-text); }
+
     #navbar.scrolled #menu-btn { color: var(--clr-text); }
+
+    /* ─── Logo Text ─────────────────────────────────────── */
+    #navbar.scrolled .logo-text { color: var(--clr-text); }
+
+    /* ─── Nav Buy Button ─────────────────────────────────── */
+    .nav-buy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 8px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--clr-gold);
+      color: #0d2e1a;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-buy-btn:hover {
+      transform: translateY(-1px) scale(1.03);
+      box-shadow: 0 4px 16px rgba(212, 136, 42, 0.35);
+    }
+
+    /* ─── Utility classes ─────────────────────────────────── */
+    .clr-muted { color: var(--clr-muted); }
+    .clr-gold { color: var(--clr-gold); }
 
     /* ─── Hero ──────────────────────────────────────────── */
     .hero-bg {
@@ -651,67 +685,72 @@
   <!-- ═══════════════════════════════════════════════════════ -->
   <!-- NAVBAR                                                  -->
   <!-- ═══════════════════════════════════════════════════════ -->
-  <nav id="navbar">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center gap-6">
+  <nav id="navbar" class="px-4 md:px-8">
+    <div class="max-w-6xl mx-auto flex items-center justify-between h-16">
 
       <!-- Logo -->
-      <a href="index.html" class="flex items-center gap-3 text-white no-underline">
-        <div class="logo-ring">
-          <span style="font-family:'Amiri',serif;color:var(--clr-gold);font-size:18px;font-weight:700;">بِسْم</span>
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-full border border-gold-400 flex items-center justify-center bg-white/10 overflow-hidden">
+          <img src="./img/logo.png" alt="AL-FATIHA" class="w-8 h-8 object-contain rounded-full">
         </div>
-        <div>
-          <div style="font-family:'Josefin Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.1em;color:#fff;">
-            AL-FATIHA</div>
-          <div style="font-size:10px;letter-spacing:0.12em;color:rgba(255,255,255,0.5);font-family:'Josefin Sans',sans-serif;text-transform:uppercase;">
-            S01 Tasbih</div>
-        </div>
-      </a>
-
-      <!-- Desktop Nav -->
-      <div class="hidden md:flex items-center gap-7 ml-8 flex-1">
-        <a href="index.html#features" class="nav-link text-white/70 hover:text-white font-display text-sm font-semibold tracking-wider uppercase no-underline" data-i18n="nav_features">功能</a>
-        <a href="index.html#how-to-use" class="nav-link text-white/70 hover:text-white font-display text-sm font-semibold tracking-wider uppercase no-underline" data-i18n="nav_how">使用方法</a>
-        <a href="prayer.html" class="nav-link font-display text-sm font-semibold tracking-wider uppercase no-underline" style="color:var(--clr-gold);" data-i18n="nav_prayer">祈祷时间</a>
-        <a href="index.html#download" class="nav-link text-white/70 hover:text-white font-display text-sm font-semibold tracking-wider uppercase no-underline" data-i18n="nav_download">下载</a>
-        <a href="index.html#contact" class="nav-link text-white/70 hover:text-white font-display text-sm font-semibold tracking-wider uppercase no-underline" data-i18n="nav_contact">联系</a>
+        <span class="logo-text font-display text-white font-semibold text-sm tracking-widest uppercase hidden sm:block">AL-FATIHA</span>
       </div>
 
-      <div class="ml-auto flex items-center gap-3">
-        <!-- Dark mode toggle -->
-        <button class="theme-icon-btn" id="theme-btn" aria-label="切换主题">
-          <i class="fa-solid fa-moon text-white/80" id="theme-icon"></i>
-        </button>
+      <!-- Nav Links (desktop) -->
+      <div class="hidden lg:flex items-center gap-4 text-white/80 text-[13px] font-display tracking-wide">
+        <a href="index.html" class="nav-link text-white/70 hover:text-white transition" data-i18n="nav_home">首页</a>
+        <a href="index.html#features" class="nav-link text-white/70 hover:text-white transition" data-i18n="nav_features">核心功能</a>
+        <a href="index.html#tasbih-demo" class="nav-link text-white/70 hover:text-white transition" data-i18n="nav_demo">在线体验</a>
+        <a href="index.html#screenshots" class="nav-link text-white/70 hover:text-white transition" data-i18n="nav_app">应用展示</a>
+        <a href="index.html#howto" class="nav-link text-white/70 hover:text-white transition" data-i18n="nav_guide">操作指南</a>
+        <a href="index.html#specs" class="nav-link text-white/70 hover:text-white transition" data-i18n="nav_specs">产品规格</a>
+        <a href="prayer.html" class="nav-link text-white/70 hover:text-white transition" style="color:var(--clr-gold);" data-i18n="nav_prayer">祈祷时间</a>
+        <a href="index.html#faq" class="nav-link text-white/70 hover:text-white transition" data-i18n="nav_faq">常见问题</a>
+        <a href="index.html#contact" class="nav-link text-white/70 hover:text-white transition" data-i18n="nav_contact">联系我们</a>
+      </div>
 
-        <!-- Language -->
+      <!-- Right Controls -->
+      <div class="flex items-center gap-3">
+        <!-- Language Dropdown -->
         <div class="lang-dropdown" id="lang-dropdown">
-          <button class="lang-dropdown-btn" id="lang-btn" onclick="toggleLang()">
-            <span id="lang-label">中文</span>
+          <button class="lang-dropdown-btn" onclick="toggleLangDropdown()">
+            <span id="lang-label">中</span>
             <i class="fa-solid fa-chevron-down"></i>
           </button>
           <div class="lang-dropdown-menu" id="lang-menu">
             <a onclick="setLang('zh')" data-lang="zh" class="active">中文</a>
             <a onclick="setLang('en')" data-lang="en">English</a>
-            <a onclick="setLang('ar')" data-lang="ar">العربية</a>
-            <a onclick="setLang('ms')" data-lang="ms">Bahasa</a>
           </div>
         </div>
-
-        <!-- Mobile menu btn -->
-        <button class="md:hidden text-white text-xl" id="menu-btn" onclick="toggleMobileMenu()">
-          <i class="fa-solid fa-bars"></i>
+        <!-- Theme Toggle -->
+        <button class="theme-icon-btn" aria-label="Toggle dark mode" id="theme-btn">
+          <i class="fa-solid fa-sun" id="theme-icon"></i>
+        </button>
+        <!-- Buy Button -->
+        <a href="index.html#purchase" class="nav-buy-btn hidden sm:inline-flex" data-i18n="nav_buy">立即购买</a>
+        <!-- Mobile menu -->
+        <button id="menu-btn" class="lg:hidden text-white ml-1" onclick="toggleMenu()">
+          <i class="fa-solid fa-bars text-lg"></i>
         </button>
       </div>
     </div>
-  </nav>
 
-  <!-- Mobile Menu -->
-  <div id="mobile-menu">
-    <a href="index.html#features" class="font-display text-lg font-semibold tracking-wider uppercase no-underline" style="color:var(--clr-text);" data-i18n="nav_features">功能</a>
-    <a href="index.html#how-to-use" class="font-display text-lg font-semibold tracking-wider uppercase no-underline" style="color:var(--clr-text);" data-i18n="nav_how">使用方法</a>
-    <a href="prayer.html" class="font-display text-lg font-semibold tracking-wider uppercase no-underline" style="color:var(--clr-gold);" data-i18n="nav_prayer">祈祷时间</a>
-    <a href="index.html#download" class="font-display text-lg font-semibold tracking-wider uppercase no-underline" style="color:var(--clr-text);" data-i18n="nav_download">下载</a>
-    <a href="index.html#contact" class="font-display text-lg font-semibold tracking-wider uppercase no-underline" style="color:var(--clr-text);" data-i18n="nav_contact">联系</a>
-  </div>
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="lg:hidden bg-black/80 backdrop-blur-md pb-4 rounded-b-xl">
+      <div class="flex flex-col gap-1 px-4 pt-2 text-white/90 text-base font-display">
+        <a href="index.html" onclick="closeMenu()" class="py-2 border-b border-white/10" data-i18n="nav_home">首页</a>
+        <a href="index.html#features" onclick="closeMenu()" class="py-2 border-b border-white/10" data-i18n="nav_features">核心功能</a>
+        <a href="index.html#tasbih-demo" onclick="closeMenu()" class="py-2 border-b border-white/10" data-i18n="nav_demo">在线体验</a>
+        <a href="index.html#screenshots" onclick="closeMenu()" class="py-2 border-b border-white/10" data-i18n="nav_app">应用展示</a>
+        <a href="index.html#howto" onclick="closeMenu()" class="py-2 border-b border-white/10" data-i18n="nav_guide">操作指南</a>
+        <a href="index.html#specs" onclick="closeMenu()" class="py-2 border-b border-white/10" data-i18n="nav_specs">产品规格</a>
+        <a href="prayer.html" onclick="closeMenu()" class="py-2 border-b border-white/10" style="color:var(--clr-gold);" data-i18n="nav_prayer">祈祷时间</a>
+        <a href="index.html#faq" onclick="closeMenu()" class="py-2 border-b border-white/10" data-i18n="nav_faq">常见问题</a>
+        <a href="index.html#contact" onclick="closeMenu()" class="py-2 border-b border-white/10" data-i18n="nav_contact">联系我们</a>
+        <a href="index.html#purchase" onclick="closeMenu()" class="py-2" data-i18n="nav_buy">立即购买</a>
+      </div>
+    </div>
+  </nav>
 
 
   <!-- ═══════════════════════════════════════════════════════ -->
@@ -1114,10 +1153,10 @@
           </div>
         </div>
         <div class="flex flex-wrap items-center justify-center gap-6">
-          <a href="index.html" class="footer-link font-display text-xs tracking-wider uppercase no-underline hover:text-gold-500" data-i18n="footer_home">首页</a>
+          <a href="index.html" class="footer-link font-display text-xs tracking-wider uppercase no-underline hover:text-gold-500" data-i18n="nav_home">首页</a>
           <a href="index.html#features" class="footer-link font-display text-xs tracking-wider uppercase no-underline hover:text-gold-500" data-i18n="nav_features">功能</a>
           <a href="prayer.html" class="footer-link font-display text-xs tracking-wider uppercase no-underline" style="color:var(--clr-gold);" data-i18n="nav_prayer">祈祷时间</a>
-          <a href="index.html#download" class="footer-link font-display text-xs tracking-wider uppercase no-underline hover:text-gold-500" data-i18n="nav_download">下载</a>
+          <a href="index.html#faq" class="footer-link font-display text-xs tracking-wider uppercase no-underline hover:text-gold-500" data-i18n="nav_faq">常见问题</a>
           <a href="index.html#contact" class="footer-link font-display text-xs tracking-wider uppercase no-underline hover:text-gold-500" data-i18n="nav_contact">联系</a>
         </div>
         <div class="text-xs clr-muted font-display tracking-wide text-center">
@@ -1139,8 +1178,9 @@
     // ─────────────────────────────────────────────────────────
     const LANGS = {
       zh: {
-        nav_features: '功能', nav_how: '使用方法', nav_prayer: '祈祷时间',
-        nav_download: '下载', nav_contact: '联系',
+        nav_home: '首页', nav_features: '核心功能', nav_demo: '在线体验',
+        nav_app: '应用展示', nav_guide: '操作指南', nav_specs: '产品规格',
+        nav_prayer: '祈祷时间', nav_faq: '常见问题', nav_contact: '联系我们', nav_buy: '立即购买',
         hero_title: '祈祷时间', hero_sub: '根据您的地理位置，精准计算每日五次礼拜时间',
         hijri_label: '伊斯兰历',
         settings_title: '设置', label_city: '城市 / City',
@@ -1164,8 +1204,9 @@
         days: ['周日','周一','周二','周三','周四','周五','周六'],
       },
       en: {
-        nav_features: 'Features', nav_how: 'How to Use', nav_prayer: 'Prayer Times',
-        nav_download: 'Download', nav_contact: 'Contact',
+        nav_home: 'Home', nav_features: 'Features', nav_demo: 'Try It',
+        nav_app: 'App', nav_guide: 'Guide', nav_specs: 'Specs',
+        nav_prayer: 'Prayer Times', nav_faq: 'FAQ', nav_contact: 'Contact', nav_buy: 'Buy Now',
         hero_title: 'Prayer Times', hero_sub: 'Accurate daily prayer times based on your location',
         hijri_label: 'Islamic Calendar',
         settings_title: 'Settings', label_city: 'City',
@@ -1189,8 +1230,9 @@
         days: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
       },
       ar: {
-        nav_features: 'الميزات', nav_how: 'طريقة الاستخدام', nav_prayer: 'أوقات الصلاة',
-        nav_download: 'تحميل', nav_contact: 'اتصل',
+        nav_home: 'الرئيسية', nav_features: 'الميزات', nav_demo: 'جرب الآن',
+        nav_app: 'التطبيق', nav_guide: 'الدليل', nav_specs: 'المواصفات',
+        nav_prayer: 'أوقات الصلاة', nav_faq: 'الأسئلة الشائعة', nav_contact: 'اتصل بنا', nav_buy: 'اشتري الآن',
         hero_title: 'أوقات الصلاة', hero_sub: 'أوقات الصلاة الدقيقة بناءً على موقعك',
         hijri_label: 'التقويم الهجري',
         settings_title: 'الإعدادات', label_city: 'المدينة',
@@ -1214,8 +1256,9 @@
         days: ['أح','إث','ثل','أر','خم','جم','سب'],
       },
       ms: {
-        nav_features: 'Ciri', nav_how: 'Cara Guna', nav_prayer: 'Waktu Solat',
-        nav_download: 'Muat Turun', nav_contact: 'Hubungi',
+        nav_home: 'Utama', nav_features: 'Ciri', nav_demo: 'Cuba',
+        nav_app: 'Aplikasi', nav_guide: 'Panduan', nav_specs: 'Spesifikasi',
+        nav_prayer: 'Waktu Solat', nav_faq: 'Soalan', nav_contact: 'Hubungi', nav_buy: 'Beli Sekarang',
         hero_title: 'Waktu Solat', hero_sub: 'Waktu solat harian yang tepat berdasarkan lokasi anda',
         hijri_label: 'Kalendar Islam',
         settings_title: 'Tetapan', label_city: 'Bandar',
@@ -1243,14 +1286,19 @@
     let currentLang = 'zh';
 
     function t(key) {
-      return (LANGS[currentLang] || LANGS.zh)[key] || (LANGS.zh)[key] || key;
+      const langObj = LANGS[currentLang] || LANGS.zh;
+      return langObj[key] || LANGS.zh[key] || key;
     }
 
     function applyI18n() {
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (LANGS[currentLang][key]) el.textContent = LANGS[currentLang][key];
+        const val = t(key);
+        if (val && val !== key) el.textContent = val;
       });
+      // Update lang label
+      const label = document.getElementById('lang-label');
+      if (label) label.textContent = {zh:'中', en:'EN'}[currentLang] || '中';
       // re-render dynamic content
       renderPrayerCards();
       renderWeeklyTable();
@@ -1260,19 +1308,31 @@
 
     function setLang(lang) {
       currentLang = lang;
-      document.getElementById('lang-label').textContent =
-        {zh:'中文', en:'English', ar:'العربية', ms:'Bahasa'}[lang];
+      const label = document.getElementById('lang-label');
+      if (label) label.textContent = {zh:'中', en:'EN'}[lang] || '中';
       document.querySelectorAll('.lang-dropdown-menu a').forEach(a => {
         a.classList.toggle('active', a.getAttribute('data-lang') === lang);
       });
-      // RTL for Arabic
       document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-      toggleLang(); // close dropdown
+      toggleLangDropdown(); // close dropdown
       applyI18n();
     }
 
-    function toggleLang() {
+    function toggleLangDropdown() {
       document.getElementById('lang-dropdown').classList.toggle('open');
+    }
+
+    function toggleMenu() {
+      document.getElementById('mobile-menu').classList.toggle('open');
+    }
+
+    function closeMenu() {
+      document.getElementById('mobile-menu').classList.remove('open');
+    }
+
+    function toggleTheme() {
+      isDark = !isDark;
+      applyTheme();
     }
 
 
@@ -1337,19 +1397,17 @@
 
     // Prayer definitions
     const PRAYERS = [
-      { key: 'fajr',    icon: 'fa-star-and-crescent', arabicNames: { zh: 'الفجر', en: 'الفجر', ar: 'الفجر', ms: 'الفجر' } },
-      { key: 'sunrise', icon: 'fa-sun',               arabicNames: { zh: 'الشروق', en: 'الشروق', ar: 'الشروق', ms: 'الشروق' } },
-      { key: 'dhuhr',   icon: 'fa-circle-dot',        arabicNames: { zh: 'الظهر', en: 'الظهر', ar: 'الظهر', ms: 'الظهر' } },
-      { key: 'asr',     icon: 'fa-cloud-sun',         arabicNames: { zh: 'العصر', en: 'العصر', ar: 'العصر', ms: 'العصر' } },
-      { key: 'maghrib', icon: 'fa-moon',              arabicNames: { zh: 'المغرب', en: 'المغرب', ar: 'المغرب', ms: 'المغرب' } },
-      { key: 'isha',    icon: 'fa-star',              arabicNames: { zh: 'العشاء', en: 'العشاء', ar: 'العشاء', ms: 'العشاء' } },
+      { key: 'fajr',    icon: 'fa-star-and-crescent', arabicName: 'الفجر' },
+      { key: 'sunrise', icon: 'fa-sun',               arabicName: 'الشروق' },
+      { key: 'dhuhr',   icon: 'fa-circle-dot',        arabicName: 'الظهر' },
+      { key: 'asr',     icon: 'fa-cloud-sun',         arabicName: 'العصر' },
+      { key: 'maghrib', icon: 'fa-moon',              arabicName: 'المغرب' },
+      { key: 'isha',    icon: 'fa-star',              arabicName: 'العشاء' },
     ];
 
     const PRAYER_NAMES_MAP = {
       zh: { fajr:'晨礼', sunrise:'日出', dhuhr:'晌礼', asr:'晡礼', sunset:'日落', maghrib:'昏礼', isha:'宵礼', midnight:'午夜' },
       en: { fajr:'Fajr', sunrise:'Sunrise', dhuhr:'Dhuhr', asr:'Asr', sunset:'Sunset', maghrib:'Maghrib', isha:'Isha', midnight:'Midnight' },
-      ar: { fajr:'الفجر', sunrise:'الشروق', dhuhr:'الظهر', asr:'العصر', sunset:'الغروب', maghrib:'المغرب', isha:'العشاء', midnight:'منتصف الليل' },
-      ms: { fajr:'Subuh', sunrise:'Syuruk', dhuhr:'Zuhur', asr:'Asar', sunset:'Terbenam', maghrib:'Maghrib', isha:'Isyak', midnight:'Tengah Malam' },
     };
 
     // ─────────────────────────────────────────────────────────
@@ -1580,7 +1638,7 @@
               <i class="fa-solid ${p.icon}"></i>
             </div>
             <div class="prayer-name">${nameMap[p.key] || p.key}</div>
-            <div class="prayer-arabic">${p.arabicNames[currentLang] || p.arabicNames.zh}</div>
+            <div class="prayer-arabic">${p.arabicName}</div>
             <div class="prayer-time">${timeStr}</div>
           </div>
         `;
@@ -1641,7 +1699,7 @@
 
     function renderWeeklyTable() {
       const nameMap = PRAYER_NAMES_MAP[currentLang] || PRAYER_NAMES_MAP.zh;
-      const days = LANGS[currentLang]?.days || LANGS.zh.days;
+      const days = LANGS[currentLang]?.days || ['周日','周一','周二','周三','周四','周五','周六'];
       const rows = document.getElementById('weekly-rows');
       const today = new Date(); today.setHours(0,0,0,0);
       let html = '';
