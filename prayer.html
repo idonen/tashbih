@@ -855,16 +855,38 @@
         <div class="mt-6">
           <label class="settings-label mb-3" data-i18n="label_region">常用地区 / Quick Select</label>
           <div class="flex flex-wrap gap-2">
-            <button class="method-pill" onclick="quickCity('Makkah', 21.3891, 39.8579, 'Asia/Riyadh')">🕋 Makkah</button>
-            <button class="method-pill" onclick="quickCity('Madinah', 24.4686, 39.6142, 'Asia/Riyadh')">🌙 Madinah</button>
-            <button class="method-pill" onclick="quickCity('Cairo', 30.0444, 31.2357, 'Africa/Cairo')">🏛 Cairo</button>
-            <button class="method-pill" onclick="quickCity('Istanbul', 41.0082, 28.9784, 'Europe/Istanbul')">🕌 Istanbul</button>
-            <button class="method-pill" onclick="quickCity('Kuala Lumpur', 3.1390, 101.6869, 'Asia/Kuala_Lumpur')">🌴 KL</button>
-            <button class="method-pill" onclick="quickCity('Jakarta', -6.2088, 106.8456, 'Asia/Jakarta')">🌺 Jakarta</button>
-            <button class="method-pill" onclick="quickCity('Dubai', 25.2048, 55.2708, 'Asia/Dubai')">🏙 Dubai</button>
-            <button class="method-pill" onclick="quickCity('London', 51.5074, -0.1278, 'Europe/London')">🎡 London</button>
-            <button class="method-pill" onclick="quickCity('New York', 40.7128, -74.0060, 'America/New_York')">🗽 New York</button>
-            <button class="method-pill" onclick="quickCity('Beijing', 39.9042, 116.4074, 'Asia/Shanghai')">🏮 Beijing</button>
+            <button class="method-pill" id="pill-Makkah"    onclick="quickCity('Makkah',     21.3891,  39.8579,  'Asia/Riyadh')">🕋 Makkah</button>
+            <button class="method-pill" id="pill-Madinah"   onclick="quickCity('Madinah',    24.4686,  39.6142,  'Asia/Riyadh')">🌙 Madinah</button>
+            <button class="method-pill" id="pill-Cairo"     onclick="quickCity('Cairo',      30.0444,  31.2357,  'Africa/Cairo')">🏛 Cairo</button>
+            <button class="method-pill" id="pill-Istanbul"  onclick="quickCity('Istanbul',   41.0082,  28.9784,  'Europe/Istanbul')">🕌 Istanbul</button>
+            <button class="method-pill" id="pill-KL"        onclick="quickCity('Kuala Lumpur', 3.1390, 101.6869, 'Asia/Kuala_Lumpur')">🌴 KL</button>
+            <button class="method-pill" id="pill-Jakarta"   onclick="quickCity('Jakarta',    -6.2088, 106.8456,  'Asia/Jakarta')">🌺 Jakarta</button>
+            <button class="method-pill" id="pill-Dubai"     onclick="quickCity('Dubai',      25.2048,  55.2708,  'Asia/Dubai')">🏙 Dubai</button>
+            <button class="method-pill" id="pill-London"    onclick="quickCity('London',     51.5074,  -0.1278,  'Europe/London')">🎡 London</button>
+            <button class="method-pill" id="pill-NewYork"   onclick="quickCity('New York',   40.7128, -74.0060,  'America/New_York')">🗽 New York</button>
+            <button class="method-pill" id="pill-Beijing"   onclick="quickCity('Beijing',    39.9042, 116.4074,  'Asia/Shanghai')">🏮 Beijing</button>
+          </div>
+        </div>
+
+        <!-- ── Calculate Button ─────────────────────────────── -->
+        <div class="mt-8 flex flex-col items-center">
+          <button
+            id="calc-btn"
+            onclick="doCalculate()"
+            class="flex items-center justify-center gap-3 px-8 py-3.5 rounded-xl font-display font-bold text-sm tracking-widest uppercase transition-all duration-200 hover:scale-105 active:scale-95"
+            style="background:linear-gradient(135deg, var(--clr-green), var(--clr-green2)); color:#fff; box-shadow:0 6px 24px rgba(26,77,46,0.35); border: 1px solid rgba(255,255,255,0.12); min-width:180px; white-space:nowrap;"
+          >
+            <i class="fa-solid fa-calculator" style="color:var(--clr-gold);font-size:16px;"></i>
+            <span data-i18n="btn_calculate">计算祈祷时间</span>
+          </button>
+
+          <!-- Pending changes indicator -->
+          <div id="pending-badge" class="inline-flex items-center gap-2 text-xs font-display tracking-wide opacity-0 transition-opacity duration-300 mt-3" style="color:var(--clr-gold);">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style="background:var(--clr-gold);"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2" style="background:var(--clr-gold);"></span>
+            </span>
+            <span data-i18n="pending_changes">参数已修改，点击计算以更新</span>
           </div>
         </div>
       </div>
@@ -1128,6 +1150,7 @@
         next_prayer: '下一次礼拜', countdown_label: '倒计时', at_time: '礼拜时间',
         day_progress: '今日进度', of_day: '今日', prayers_done: ' 次礼拜已过',
         select_date: '选择日期', btn_today: '今天',
+        btn_calculate: '计算祈祷时间', pending_changes: '参数已修改，点击计算以更新',
         section_times: '今日礼拜时间',
         weekly_title: '本周礼拜时间',
         th_date: '日期', th_fajr: '晨礼', th_dhuhr: '晌礼', th_asr: '晡礼',
@@ -1152,6 +1175,7 @@
         next_prayer: 'Next Prayer', countdown_label: 'Countdown', at_time: 'Prayer Time',
         day_progress: 'Day Progress', of_day: 'Today', prayers_done: ' prayers passed',
         select_date: 'Select Date', btn_today: 'Today',
+        btn_calculate: 'Calculate Prayer Times', pending_changes: 'Settings changed — click Calculate to update',
         section_times: "Today's Prayer Times",
         weekly_title: 'Weekly Prayer Times',
         th_date: 'Date', th_fajr: 'Fajr', th_dhuhr: 'Dhuhr', th_asr: 'Asr',
@@ -1176,6 +1200,7 @@
         next_prayer: 'الصلاة القادمة', countdown_label: 'العد التنازلي', at_time: 'وقت الصلاة',
         day_progress: 'تقدم اليوم', of_day: 'اليوم', prayers_done: ' صلوات مضت',
         select_date: 'اختر التاريخ', btn_today: 'اليوم',
+        btn_calculate: 'احسب أوقات الصلاة', pending_changes: 'تم تغيير الإعدادات — انقر لحساب',
         section_times: 'أوقات الصلاة اليوم',
         weekly_title: 'أوقات الصلاة الأسبوعية',
         th_date: 'التاريخ', th_fajr: 'الفجر', th_dhuhr: 'الظهر', th_asr: 'العصر',
@@ -1200,6 +1225,7 @@
         next_prayer: 'Solat Seterusnya', countdown_label: 'Kiraan Undur', at_time: 'Waktu Solat',
         day_progress: 'Kemajuan Hari', of_day: 'Hari ini', prayers_done: ' solat telah berlalu',
         select_date: 'Pilih Tarikh', btn_today: 'Hari Ini',
+        btn_calculate: 'Kira Waktu Solat', pending_changes: 'Tetapan berubah — klik untuk kira',
         section_times: 'Waktu Solat Hari Ini',
         weekly_title: 'Waktu Solat Mingguan',
         th_date: 'Tarikh', th_fajr: 'Subuh', th_dhuhr: 'Zuhur', th_asr: 'Asar',
@@ -1420,12 +1446,12 @@
       document.getElementById('city-input').value = name;
       document.getElementById('search-results').style.display = 'none';
       document.getElementById('location-text').textContent = `${name} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
-      updateAll();
+      // 选择城市时立即触发计算
+      doCalculate();
     }
 
     function quickCity(name, lat, lng, tz) {
       selectCity(name, lat, lng, tz);
-      document.getElementById('city-input').value = name;
     }
 
     // ─────────────────────────────────────────────────────────
@@ -1445,7 +1471,7 @@
           document.getElementById('city-input').value = `GPS: ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)}`;
           document.getElementById('location-text').textContent = `GPS (${state.lat.toFixed(4)}, ${state.lng.toFixed(4)})`;
           if (btn) btn.innerHTML = '<i class="fa-solid fa-location-crosshairs" style="color:var(--clr-gold);"></i>';
-          updateAll();
+          doCalculate();
         },
         () => {
           if (btn) btn.innerHTML = '<i class="fa-solid fa-location-crosshairs" style="color:var(--clr-gold);"></i>';
@@ -1456,27 +1482,45 @@
 
 
     // ─────────────────────────────────────────────────────────
-    //  Settings handlers
+    //  Settings handlers  ← 仅标记 pending，不立即计算
     // ─────────────────────────────────────────────────────────
-    function onMethodChange() {
-      state.method = document.getElementById('method-select').value;
-      document.getElementById('loc-method').textContent = state.method;
-      updateAll();
+    function markPending() {
+      document.getElementById('pending-badge').style.opacity = '1';
     }
 
-    function onFormatChange() {
-      state.format = document.getElementById('format-select').value;
-      updateAll();
-    }
+    function onMethodChange()  { markPending(); }
+    function onFormatChange()  { markPending(); }
+    function onAsrChange()     { markPending(); }
+    function onHighLatChange() { markPending(); }
 
-    function onAsrChange() {
-      state.asr = document.getElementById('asr-select').value;
-      updateAll();
-    }
-
-    function onHighLatChange() {
+    // ── Calculate Button Handler ──────────────────────────────
+    function doCalculate() {
+      // Read all current form values into state
+      state.method   = document.getElementById('method-select').value;
+      state.format   = document.getElementById('format-select').value;
+      state.asr      = document.getElementById('asr-select').value;
       state.highLats = document.getElementById('highlat-select').value;
-      updateAll();
+
+      // Visual feedback: spin icon then checkmark
+      const btn  = document.getElementById('calc-btn');
+      const icon = btn.querySelector('i');
+      icon.className = 'fa-solid fa-spinner fa-spin';
+      icon.style.color = '#fff';
+      btn.disabled = true;
+
+      // Use setTimeout so the spinner paints before the CPU-heavy compute
+      setTimeout(() => {
+        updateAll();
+        document.getElementById('loc-method').textContent = state.method;
+
+        // Restore button
+        icon.className = 'fa-solid fa-check';
+        icon.style.color = 'var(--clr-gold)';
+        document.getElementById('pending-badge').style.opacity = '0';
+        btn.disabled = false;
+
+        setTimeout(() => { icon.className = 'fa-solid fa-calculator'; icon.style.color = 'var(--clr-gold)'; }, 1400);
+      }, 50);
     }
 
 
@@ -1943,12 +1987,21 @@
     //  Init
     // ─────────────────────────────────────────────────────────
     function init() {
-      // Set default city (Makkah)
+      // Default: Makkah — set UI display
       document.getElementById('city-input').value = 'Makkah';
       document.getElementById('location-text').textContent = 'Makkah (21.3891, 39.8579)';
 
+      // Sync selects to match initial state
+      document.getElementById('method-select').value  = state.method;
+      document.getElementById('format-select').value  = state.format;
+      document.getElementById('asr-select').value     = state.asr;
+      document.getElementById('highlat-select').value = state.highLats;
+
       updateHijriDate();
-      updateAll();
+
+      // Initial calculation using praytime.js API
+      doCalculate();
+
       renderCalendarStrip();
       renderNotifGrid();
       initFadeIn();
@@ -1961,7 +2014,7 @@
         checkNotifications();
       }, 1000);
 
-      // Refresh prayer times every minute
+      // Refresh prayer times every minute (for the selected date if it is today)
       setInterval(() => {
         if (isSameDay(state.selectedDate, new Date())) {
           currentTimes = getPrayerTimes(state.selectedDate);
