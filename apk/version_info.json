@@ -1,9 +1,9 @@
 {
-  "versionCode": 27,
-  "versionName": "1.1.27",
+  "versionCode": 28,
+  "versionName": "1.1.28",
   "apkUrl": "https://idonen.github.io/tashbih/apk/AL-FATIHA.apk",
   "updateLog": "1.fix some bug",
   "isForceUpdate": false,
   "fileSize": "20904581",
-  "releaseDate": "2026-08-03"
+  "releaseDate": "2026-08-05"
 }
